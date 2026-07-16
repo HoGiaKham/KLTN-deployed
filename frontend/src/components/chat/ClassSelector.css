@@ -1,0 +1,162 @@
+.class-selector-container {
+  padding: 20px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.class-selector-info {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.class-selector-info p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.class-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.class-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: white;
+  border-radius: 12px;
+  border: 2px solid #e0e0e0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.class-item:hover {
+  border-color: #667eea;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+.class-item-avatar {
+  flex-shrink: 0;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.class-item-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.class-item-avatar .avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.class-item-info {
+  flex: 1;
+}
+
+.class-item-info h4 {
+  margin: 0 0 4px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.class-item-info .subject-name {
+  margin: 0;
+  font-size: 14px;
+  color: #667eea;
+  font-weight: 500;
+}
+
+.class-item-info .class-name {
+  margin: 4px 0 0 0;
+  font-size: 13px;
+  color: #666;
+}
+
+.arrow-icon {
+  font-size: 20px;
+  color: #667eea;
+  font-weight: bold;
+}
+
+.creating-spinner {
+  font-size: 20px;
+  color: #667eea;
+  animation: pulse 1s infinite;
+}
+
+.loading-spinner,
+.error-message,
+.empty-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  color: #666;
+}
+
+.empty-message p {
+  margin: 8px 0;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.empty-message .sub-text {
+  font-size: 14px;
+  color: #999;
+  font-weight: 400;
+}
+
+.error-message {
+  color: #e74c3c;
+}
+
+@media (max-width: 768px) {
+  .class-selector-container {
+    padding: 16px;
+  }
+
+  .class-item {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .class-item-avatar {
+    width: 44px;
+    height: 44px;
+  }
+
+  .class-item-info h4 {
+    font-size: 15px;
+  }
+
+  .class-item-info .subject-name {
+    font-size: 13px;
+  }
+
+  .class-item-info .class-name {
+    font-size: 12px;
+  }
+}

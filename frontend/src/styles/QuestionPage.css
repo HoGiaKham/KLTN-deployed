@@ -1,0 +1,283 @@
+.question-page {
+  padding: 15px;
+  position: relative;
+  overflow: visible;
+}
+
+.question-page .header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.question-page .add-question-btn {
+  background: #007bff;
+  color: white;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+}
+.question-page .add-question-btn:hover {
+  background: #0056b3;
+}
+
+.question-page ul {
+  list-style: none;
+  padding: 0;
+}
+.question-page li {
+  margin-bottom: 5px;
+  padding-bottom: 5px;
+  font-size: 16px;
+}
+.question-page li:not(:last-child) {
+  border-bottom: 1px solid #eee;
+}
+
+.question-page .question-item {
+  display: block;
+}
+.question-page .question-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+.question-page .question-content {
+  display: block;
+}
+
+.question-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.arrow {
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.arrow.open {
+  transform: rotate(180deg);
+}
+
+/* ✅ gear-btn giữ màu xám, nền trong suốt */
+.gear-btn {
+  background: transparent !important;
+  border: none !important;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333 !important;
+}
+.gear-btn:hover {
+  background: #f0f0f0 !important;
+}
+
+.question-page .answer-list {
+  margin-top: 12px;
+  padding: 12px 12px 12px 25px;
+  list-style-position: inside;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  background-color: #fafafa;
+}
+
+.question-page .answer-list li {
+  margin-bottom: 6px;
+  line-height: 1.6;
+  font-size: 15px;
+}
+
+.question-page .context-menu {
+  position: fixed;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 4000;
+  min-width: 150px;
+  padding: 5px 0;
+}
+.question-page .context-menu-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 14px;
+}
+.question-page .context-menu-item:hover {
+  background: #f0f0f0;
+}
+.question-page .context-menu-item.delete {
+  color: #d33;
+}
+.question-page .context-menu-item.delete:hover {
+  background: #ffe6e6;
+}
+
+.question-page .modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 5000;
+}
+.question-page .modal-content {
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  max-width: 650px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  position: relative;
+}
+.question-page .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+.question-page .modal-close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+  position: absolute;
+  top: 15px;
+  right: 15px;
+}
+.question-page .modal-close-btn:hover {
+  color: #000;
+}
+
+.question-page textarea,
+.question-page input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 15px;
+  margin-bottom: 10px;
+}
+.question-page .option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.question-page img {
+  max-width: 100%;
+  max-height: 300px;
+  object-fit: contain;
+  display: block;
+  margin: 10px 0;
+  border-radius: 8px;
+  border: 1px solid #eee;
+}
+
+.question-page button:not(.gear-btn) {
+  background: #007bff;
+  color: white;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.question-page button:not(.gear-btn):hover {
+  background: #0056b3;
+}
+
+/* ✅ Editor Toolbar Styles */
+.editor-toolbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+}
+
+.editor-toolbar .toolbar-btn {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: #f8f9fa;
+  color: #333;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  min-width: 40px;
+  text-align: center;
+}
+
+.editor-toolbar .toolbar-btn:hover {
+  background-color: #007bff;
+  color: white;
+  border-color: #0056b3;
+  transform: scale(1.05);
+}
+
+.editor-toolbar .toolbar-btn.active {
+  background-color: #0056b3;
+  color: white;
+  border-color: #004085;
+  box-shadow: 0 0 0 2px rgba(0, 86, 179, 0.25);
+}
+
+.editor-toolbar select {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  background-color: #f8f9fa;
+}
+
+.editor-toolbar select:hover {
+  border-color: #007bff;
+}
+
+/* ✅ Rich Text Editor - Căn trái */
+.rich-text-editor {
+  text-align: left !important;
+  outline: none;
+  padding: 12px;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  min-height: 120px;
+  font-size: 14px;
+  line-height: 1.5;
+  background-color: #fff;
+  transition: all 0.2s ease;
+  margin-bottom: 12px;
+}
+
+.rich-text-editor:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+.rich-text-editor > * {
+  text-align: left !important;
+}

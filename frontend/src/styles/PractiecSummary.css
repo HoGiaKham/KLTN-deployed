@@ -1,0 +1,213 @@
+.summary-container {
+  background: #fff;
+  padding: 24px;
+  border-radius: 10px;
+  max-width: "100%";
+  width: calc(100% - 40px);
+  margin: 30px auto;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  position: relative;
+  box-sizing: border-box;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.summary-container h2 {
+  margin: 0 0 18px 0;
+  color: #2e3cd4;
+  font-size: 30px;
+  text-align: left;
+}
+
+.summary-box {
+  background: #fbfbff;
+  border-radius: 10px;
+  padding: 14px;
+  border: 1px solid #eef0ff;
+  box-sizing: border-box;
+}
+
+.summary-header-row {
+  display: grid;
+  grid-template-columns: 1fr 180px;
+  gap: 12px;
+  padding: 12px 16px;
+  align-items: center;
+  font-weight: 700;
+  color: #444;
+  border-bottom: 1px solid #e6e9ff;
+  font-size: 24px;
+}
+
+.summary-rows {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.summary-row {
+  display: grid;
+  grid-template-columns: 1fr 180px;
+  gap: 12px;
+  padding: 12px 16px;
+  align-items: center;
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #f1f3ff;
+  box-shadow: 0 1px 2px rgba(18, 38, 63, 0.02);
+}
+
+.col-left {
+  font-weight: "bold";
+  color: #222;
+  text-align: left;
+  font-size: 20;
+}
+
+.col-right {
+  text-align: right;
+}
+
+.status {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.status.answered {
+  background: rgba(46, 204, 113, 0.12);
+  color: #27ae60;
+  border: 1px solid rgba(39, 174, 96, 0.12);
+}
+
+.status.not-answered {
+  background: rgba(231, 76, 60, 0.08);
+  color: #e74c3c;
+  border: 1px solid rgba(231, 76, 60, 0.08);
+}
+
+.summary-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.btn-back {
+  background: #4b4bff;
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-submit {
+  background: #2e3cd4;
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  box-shadow: 0 6px 18px rgba(46, 60, 212, 0.12);
+}
+
+.btn-back:hover, .btn-submit:hover {
+  transform: translateY(-1px);
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2200;
+  backdrop-filter: blur(3px);
+  animation: modalFade 0.22s ease;
+}
+
+.modal-content {
+  background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
+  padding: 34px 36px;
+  border-radius: 16px;
+  width: 520px;
+  max-width: calc(100% - 40px);
+  text-align: center;
+  box-shadow: 0 18px 40px rgba(12, 40, 90, 0.12);
+  animation: modalPop 0.28s cubic-bezier(.2,.9,.2,1);
+}
+
+.modal-content h3 {
+  margin: 0 0 8px 0;
+  color: #e74c3c;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.modal-content h4 {
+  margin: 0 0 20px 0;
+  color: #444;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+}
+
+.modal-buttons .modal-cancel {
+  flex: 1;
+  background: #f0f0f2;
+  color: #333;
+  border: none;
+  padding: 12px 0;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.modal-buttons .modal-confirm:hover {
+  transform: translateY(-2px);
+  background: #2530b8;
+}
+.modal-buttons .modal-confirm {
+  flex: 1;
+  background: #552bdf;
+  color: #fff;
+  border: none;
+  padding: 12px 0;
+  border-radius: 10px;
+  font-weight: 800;
+  box-shadow: 0 8px 20px rgba(39, 174, 96, 0.18);
+  cursor: pointer;
+}
+
+.modal-buttons .modal-cancel:hover { transform: translateY(-2px); }
+.modal-buttons .modal-confirm:hover { transform: translateY(-2px); background: #219150; }
+
+@keyframes modalPop {
+  from { transform: translateY(24px) scale(.98); opacity: 0; }
+  to   { transform: translateY(0) scale(1); opacity: 1; }
+}
+@keyframes modalFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+@media (max-width: 600px) {
+  .summary-container { padding: 18px; }
+  .summary-header-row, .summary-row { grid-template-columns: 1fr 140px; }
+  .modal-content { padding: 22px; width: 92%; }
+}

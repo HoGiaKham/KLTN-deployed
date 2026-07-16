@@ -1,0 +1,211 @@
+.student-exams-container {
+  padding: 30px 60px;
+  background: #f9fafc;
+  min-height: 100vh;
+  font-family: "Segoe UI", Roboto, sans-serif;
+}
+
+/* Header giống giảng viên */
+.student-exams-header {
+  background: linear-gradient(90deg, #4338ca, #6366f1);
+  color: white;
+  padding: 20px 30px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+}
+
+.student-exams-header h2 {
+  margin: 0 0 6px;
+  font-size: 1.6rem;
+  font-weight: 600;
+}
+
+.student-exams-header p {
+  margin: 0;
+  font-size: 0.95rem;
+  opacity: 0.9;
+}
+
+/* Exam list */
+.exam-list {
+  display: flex;
+  flex-direction: column;
+  gap: 50px;
+}
+
+.exam-item {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.25s ease;
+}
+
+.exam-item:hover {
+  border-color: #6366f1;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+  transform: translateY(-3px);
+}
+
+/* Left info */
+.exam-left {
+  flex: 1;
+}
+
+.exam-left h3 {
+  font-size: 1.15rem;
+  color: #1e3a8a;
+  margin: 6px 0;
+}
+
+.exam-meta {
+  color: #475569;
+  font-size: 0.9rem;
+}
+
+.exam-time,
+.exam-attempts {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin-top: 4px;
+}
+
+/* Right actions */
+.exam-right { 
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  min-width: 150px;
+}
+
+/* Status tag */
+.status-tag {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  margin-bottom: 6px;
+  text-transform: capitalize;
+}
+
+.status-tag.open {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #86efac;
+}
+
+.status-tag.closed {
+  background: #f1f5f9;
+  color: #64748b;
+  border: 1px solid #cbd5e1;
+}
+
+.status-tag.not-open {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+}
+
+.status-tag.unset {
+  background: #f8fafc;
+  color: #94a3b8;
+  border: 1px solid #e2e8f0;
+}
+
+/* Right actions */
+.exam-right {
+  display: flex;
+  flex-direction: row; /* đổi từ column -> row để nằm ngang */
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  min-width: 200px;
+}
+
+/* Buttons */
+.start-btn,
+.review-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  width: auto; /* để vừa nút */
+  min-width: 100px;
+}
+
+.start-btn.active {
+  background: #1e3a8a;
+  color: #fff;
+}
+
+.start-btn.active:hover {
+  background: #273e89;
+}
+
+.start-btn.disabled {
+  background: #cbd5e1;
+  color: #64748b;
+  cursor: not-allowed;
+}
+
+.start-btn.expired {
+  background: #fecaca;
+  color: #991b1b;
+  cursor: not-allowed;
+  border: 1px solid #fca5a5;
+}
+
+.start-btn.expired:hover {
+  background: #fecaca;
+}
+
+.review-btn {
+  background: #f1f5f9;
+  color: #1e3a8a;
+  border: 1px solid #cbd5e1;
+}
+
+.review-btn:hover {
+  background: #e0e7ff;
+}
+
+
+/* Empty / Loading */
+.loading-text,
+.empty-state {
+  text-align: center;
+  padding: 40px 0;
+  color: #64748b;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .student-exams-container {
+    padding: 20px;
+  }
+
+  .exam-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .exam-right {
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .start-btn,
+  .review-btn {
+    width: 100%;
+  }
+}

@@ -1,0 +1,22 @@
+[
+  {"_id":"CLASS001","name":"CS2024-01","program":"Computer Science","year":2024,"semesterId":"SEM2024S1"},
+  {"_id":"CLASS002","name":"CS2024-02","program":"Computer Science","year":2024,"semesterId":"SEM2024S1"},
+  {"_id":"CLASS003","name":"IT2024-01","program":"Information Technology","year":2024,"semesterId":"SEM2024S1"},
+  {"_id":"CLASS004","name":"EE2024-01","program":"Electrical Engineering","year":2024,"semesterId":"SEM2024S1"},
+  {"_id":"CLASS005","name":"MATH2024-01","program":"Mathematics","year":2024,"semesterId":"SEM2024S1"},
+  {"_id":"CLASS006","name":"CS2024-03","program":"Computer Science","year":2024,"semesterId":"SEM2024S1"},
+  {"_id":"CLASS007","name":"CS2024-04","program":"Computer Science","year":2024,"semesterId":"SEM2024S1"},
+  {"_id":"CLASS008","name":"ECON2024-01","program":"Economics","year":2024,"semesterId":"SEM2024S1"},
+  {"_id":"CLASS009","name":"MGMT2024-01","program":"Management","year":2024,"semesterId":"SEM2024S1"},
+  {"_id":"CLASS010","name":"ACCT2024-01","program":"Accounting","year":2024,"semesterId":"SEM2024S1"},
+  {"_id":"CLASS011","name":"CS2023-01","program":"Computer Science","year":2023,"semesterId":"SEM2024S2"},
+  {"_id":"CLASS012","name":"CS2023-02","program":"Computer Science","year":2023,"semesterId":"SEM2024S2"},
+  {"_id":"CLASS013","name":"IT2023-01","program":"Information Technology","year":2023,"semesterId":"SEM2024S2"},
+  {"_id":"CLASS014","name":"CS2025-01","program":"Computer Science","year":2025,"semesterId":"SEM2025S1"},
+  {"_id":"CLASS015","name":"CS2025-02","program":"Computer Science","year":2025,"semesterId":"SEM2025S1"},
+  {"_id":"CLASS016","name":"EE2025-01","program":"Electrical Engineering","year":2025,"semesterId":"SEM2025S1"},
+  {"_id":"CLASS017","name":"MATH2025-01","program":"Mathematics","year":2025,"semesterId":"SEM2025S1"},
+  {"_id":"CLASS018","name":"BIO2024-01","program":"Biology","year":2024,"semesterId":"SEM2024S1"},
+  {"_id":"CLASS019","name":"CS2024-05","program":"Computer Science","year":2024,"semesterId":"SEM2024S1"},
+  {"_id":"CLASS020","name":"CS2024-06","program":"Computer Science","year":2024,"semesterId":"SEM2024S1"}
+]

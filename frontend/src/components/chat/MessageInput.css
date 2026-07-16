@@ -1,0 +1,100 @@
+.message-input-container {
+  display: flex;
+  gap: 10px;
+  padding: 16px;
+  background: white;
+  border-top: 2px solid #e0e0e0;
+  flex-shrink: 0;
+}
+
+.image-button {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid #667eea;
+  background: white;
+  color: #667eea;
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-button:hover:not(:disabled) {
+  background: #667eea;
+  transform: scale(1.05);
+}
+
+.image-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.message-input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 24px;
+  font-size: 14px;
+  font-family: "Segoe UI", sans-serif;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.message-input:focus {
+  border-color: #667eea;
+}
+
+.message-input:disabled {
+  background: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.send-button {
+  flex-shrink: 0;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.send-button:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.send-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .message-input-container {
+    padding: 12px;
+    gap: 8px;
+  }
+
+  .image-button {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+
+  .message-input {
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+
+  .send-button {
+    padding: 10px 20px;
+    font-size: 13px;
+  }
+}

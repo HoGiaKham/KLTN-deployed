@@ -1,0 +1,228 @@
+.admin-semester-container {
+  padding: 30px;
+  background: #f8f9fc;
+  min-height: 100vh;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.header h2 {
+  margin: 0;
+  color: #1a73e8;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.add-btn {
+  background: linear-gradient(135deg, #1a73e8, #0d47a1);
+  color: white;
+  border: none;
+  padding: 11px 20px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(26, 115, 232, 0.3);
+}
+
+.add-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(26, 115, 232, 0.4);
+}
+
+.semester-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.semester-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  border: 1px solid #eee;
+}
+
+.semester-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.semester-card.active {
+  border: 2px solid #1a73e8;
+  background: #f0f7ff;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.card-header h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #1a73e8;
+  font-weight: 600;
+}
+
+.badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge.active {
+  background: #1a73e8;
+  color: white;
+}
+
+.card-body p {
+  margin: 6px 0;
+  color: #555;
+  font-size: 14.5px;
+}
+
+.card-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.btn-edit, .btn-delete {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-edit {
+  background: #3498db;
+  color: white;
+}
+
+.btn-edit:hover {
+  background: #2980b9;
+}
+
+.btn-delete {
+  background: #e74c3c;
+  color: white;
+}
+
+.btn-delete:hover {
+  background: #c0392b;
+}
+
+.no-data {
+  text-align: center;
+  color: #999;
+  font-style: italic;
+  grid-column: 1 / -1;
+  padding: 40px;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  background: white;
+  padding: 30px;
+  border-radius: 14px;
+  width: 460px;
+  max-width: 90%;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.2);
+}
+
+.modal-content h3 {
+  margin: 0 0 20px;
+  color: #1a73e8;
+  font-size: 21px;
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #333;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid #ddd;
+  border-radius: 8px;
+  font-size: 15px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14.5px;
+  color: #555;
+  margin: 16px 0;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.btn-cancel {
+  background: #f5f5f5;
+  color: #555;
+  border: 1px solid #ddd;
+}
+
+.btn-confirm {
+  background: #1a73e8;
+  color: white;
+}
+
+.btn-cancel, .btn-confirm {
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  min-width: 90px;
+}
+.date-hint {
+  display: block;
+  margin-top: 6px;
+  font-size: 13.5px;
+  color: #1a73e8;
+  font-weight: 500;
+}
+
+.date-hint strong {
+  color: #0d47a1;
+}

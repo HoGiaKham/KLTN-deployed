@@ -1,0 +1,22 @@
+[
+  {"_id":"TA001","teacherId":"TCH001","subjectId":"SUBJ005","classId":"CLASS001","semesterId":"SEM2024S1"},
+  {"_id":"TA002","teacherId":"TCH002","subjectId":"SUBJ006","classId":"CLASS001","semesterId":"SEM2024S1"},
+  {"_id":"TA003","teacherId":"TCH003","subjectId":"SUBJ007","classId":"CLASS002","semesterId":"SEM2024S1"},
+  {"_id":"TA004","teacherId":"TCH004","subjectId":"SUBJ008","classId":"CLASS003","semesterId":"SEM2024S1"},
+  {"_id":"TA005","teacherId":"TCH005","subjectId":"SUBJ009","classId":"CLASS003","semesterId":"SEM2024S1"},
+  {"_id":"TA006","teacherId":"TCH006","subjectId":"SUBJ010","classId":"CLASS004","semesterId":"SEM2024S1"},
+  {"_id":"TA007","teacherId":"TCH007","subjectId":"SUBJ011","classId":"CLASS005","semesterId":"SEM2024S1"},
+  {"_id":"TA008","teacherId":"TCH008","subjectId":"SUBJ012","classId":"CLASS006","semesterId":"SEM2024S1"},
+  {"_id":"TA009","teacherId":"TCH009","subjectId":"SUBJ013","classId":"CLASS007","semesterId":"SEM2024S1"},
+  {"_id":"TA010","teacherId":"TCH010","subjectId":"SUBJ014","classId":"CLASS008","semesterId":"SEM2024S1"},
+  {"_id":"TA011","teacherId":"TCH011","subjectId":"SUBJ015","classId":"CLASS009","semesterId":"SEM2024S1"},
+  {"_id":"TA012","teacherId":"TCH012","subjectId":"SUBJ016","classId":"CLASS010","semesterId":"SEM2024S1"},
+  {"_id":"TA013","teacherId":"TCH013","subjectId":"SUBJ017","classId":"CLASS011","semesterId":"SEM2024S2"},
+  {"_id":"TA014","teacherId":"TCH014","subjectId":"SUBJ018","classId":"CLASS012","semesterId":"SEM2024S2"},
+  {"_id":"TA015","teacherId":"TCH015","subjectId":"SUBJ019","classId":"CLASS013","semesterId":"SEM2024S2"},
+  {"_id":"TA016","teacherId":"TCH016","subjectId":"SUBJ020","classId":"CLASS014","semesterId":"SEM2025S1"},
+  {"_id":"TA017","teacherId":"TCH017","subjectId":"SUBJ021","classId":"CLASS015","semesterId":"SEM2025S1"},
+  {"_id":"TA018","teacherId":"TCH018","subjectId":"SUBJ022","classId":"CLASS016","semesterId":"SEM2025S1"},
+  {"_id":"TA019","teacherId":"TCH019","subjectId":"SUBJ023","classId":"CLASS017","semesterId":"SEM2025S1"},
+  {"_id":"TA020","teacherId":"TCH020","subjectId":"SUBJ024","classId":"CLASS018","semesterId":"SEM2024S1"}
+]
