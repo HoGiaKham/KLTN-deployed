@@ -1,3 +1,4 @@
+const jwt = require("jsonwebtoken");
 const ChatRoom = require("../models/ChatRoom");
 const Message = require("../models/Message");
 const Class = require("../models/Class");
@@ -7,19 +8,23 @@ const Class = require("../models/Class");
  * @param {Socket.Server} io - Socket.IO server instance
  */
 function initializeChatSocket(io) {
-  // Middleware: Authenticate socket connections
+  // Middleware: Authenticate socket connections using JWT
   io.use((socket, next) => {
-    const { userId, userRole } = socket.handshake.auth;
+    const { token } = socket.handshake.auth;
 
-    if (!userId || !userRole) {
+    if (!token) {
       return next(new Error("Authentication required"));
     }
 
-    // Attach user info to socket
-    socket.userId = userId;
-    socket.userRole = userRole;
-
-    next();
+    try {
+      const payload = jwt.verify(token, process.env.JWT_SECRET || "default_jwt_secret");
+      socket.userId = payload.id;
+      socket.userRole = payload.role;
+      next();
+    } catch (err) {
+      console.error("Socket JWT verification failed:", err.message);
+      return next(new Error("Invalid authentication token"));
+    }
   });
 
   io.on("connection", (socket) => {

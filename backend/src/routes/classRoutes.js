@@ -42,8 +42,6 @@ router.get("/", async (req, res) => {
       else {
         filter = semesterFilter;
       }
-
-      console.log("[DEBUG] Filter:", filter);
     }
 
     const classes = await Class.find(filter)
@@ -52,7 +50,6 @@ router.get("/", async (req, res) => {
       .populate("subject", "name")
       .populate("semester", "name isActive");
 
-    console.log("[DEBUG] Classes returned:", classes.map(c => c.className));
 
     res.json(classes);
   } catch (err) {

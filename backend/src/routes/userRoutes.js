@@ -1,5 +1,7 @@
 const express = require("express");
 const router = express.Router();
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const multer = require("multer");
 const path = require("path");
@@ -10,6 +12,20 @@ const Category = require("../models/Category");
 const PracticeExam = require("../models/PracticeExam");
 const Exam = require("../models/Exam");
 const TeachingAssignment = require("../models/TeachingAssignment");
+
+const JWT_SECRET = process.env.JWT_SECRET || "default_jwt_secret";
+
+const signToken = (user) => {
+  return jwt.sign(
+    {
+      id: user._id,
+      username: user.username,
+      role: user.role,
+    },
+    JWT_SECRET,
+    { expiresIn: "7d" }
+  );
+};
 // Cấu hình multer cho upload avatar
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -77,7 +93,7 @@ router.post("/:id/reset-password", async (req, res) => {
       return res.status(404).json({ message: "Không tìm thấy sinh viên" });
     }
 
-    user.password = "123456";
+    user.password = await bcrypt.hash("123456", 10);
     await user.save();
 
     res.json({ message: "Đã reset mật khẩu về 123456 thành công!" });
@@ -102,19 +118,39 @@ router.post("/login", async (req, res) => {
   try {
     const { username, password } = req.body;
     const user = await User.findOne({ username });
-    if (!user || user.password !== password) {
+    if (!user) {
       return res.status(401).json({ message: "Sai tài khoản hoặc mật khẩu" });
     }
-    
+
+    const isHashed = user.password.startsWith("$2");
+    let match = false;
+
+    if (isHashed) {
+      match = await bcrypt.compare(password, user.password);
+    } else {
+      match = password === user.password;
+    }
+
+    if (!match) {
+      return res.status(401).json({ message: "Sai tài khoản hoặc mật khẩu" });
+    }
+
+    if (!isHashed) {
+      user.password = await bcrypt.hash(password, 10);
+      await user.save();
+    }
+
+    const token = signToken(user);
     res.json({
       message: "Đăng nhập thành công",
+      token,
       user: {
         _id: user._id,
         username: user.username,
         name: user.name,
         role: user.role,
-        avatar: user.avatar,        // Bao gồm avatar
-        avatarUrl: user.avatarUrl, // Bao gồm avatarUrl từ virtual field
+        avatar: user.avatar,
+        avatarUrl: user.avatarUrl,
         subjects: user.subjects || [],
         className: user.className || "",
       },
@@ -133,7 +169,10 @@ router.put("/:id", async (req, res) => {
     if (!user) return res.status(404).json({ message: "User not found" });
     
     if (name) user.name = name;
-    if (password) user.password = password;
+    if (password) {
+      const hashed = await bcrypt.hash(password, 10);
+      user.password = hashed;
+    }
     if (className !== undefined) user.className = className;
     if (avatar !== undefined) user.avatar = avatar; // Cập nhật avatar
     if (subjects && Array.isArray(subjects)) {
@@ -141,7 +180,9 @@ router.put("/:id", async (req, res) => {
     }
     
     await user.save();
-    res.json(user);
+    const updatedUser = user.toObject();
+    delete updatedUser.password;
+    res.json(updatedUser);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -157,16 +198,19 @@ router.post("/", async (req, res) => {
     const existing = await User.findOne({ username });
     if (existing) return res.status(400).json({ message: "Username đã tồn tại" });
     
+    const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({
       username,
-      password,
+      password: hashedPassword,
       name,
       role,
       subjects: subjects || [],
     });
     
     await newUser.save();
-    res.status(201).json(newUser);
+    const createdUser = newUser.toObject();
+    delete createdUser.password;
+    res.status(201).json(createdUser);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

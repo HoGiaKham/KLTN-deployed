@@ -91,11 +91,11 @@ function Sidebar({ user, onLogout }) {
 <h2 className="sidebar-title">
   <div className="title-role">
     {currentUser?.role === "teacher"
-      ? "Dashboard giảng viên"
+      ? "Giảng viên"
       : currentUser?.role === "student"
-      ? "Dashboard sinh viên"
+      ? "Sinh viên"
       : currentUser?.role === "admin"
-      ? "Dashboard quản trị viên"
+      ? "Quản trị viên"
       : "Dashboard"}
   </div>
   {currentUser?.name && (

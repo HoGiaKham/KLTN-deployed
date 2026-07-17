@@ -47,8 +47,8 @@ function App() {
         setUser(parsedUser);
 
         // Initialize socket connection for logged-in users
-        if (parsedUser && parsedUser._id && parsedUser.role) {
-          initializeSocket(parsedUser._id, parsedUser.role);
+        if (parsedUser && parsedUser.token) {
+          initializeSocket(parsedUser.token);
         }
       } catch (err) {
         console.error("Error parsing user:", err);
@@ -67,8 +67,8 @@ function App() {
     localStorage.setItem("app_user", JSON.stringify(userObj));
 
     // Initialize socket connection after login
-    if (userObj && userObj._id && userObj.role) {
-      initializeSocket(userObj._id, userObj.role);
+    if (userObj && userObj.token) {
+      initializeSocket(userObj.token);
     }
 
     if (userObj.role === "teacher") navigate("/profile");

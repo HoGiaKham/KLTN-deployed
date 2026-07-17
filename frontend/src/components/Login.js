@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { FaUser, FaLock } from "react-icons/fa";
+import { API_BASE } from "../config";
 
 function Login({ onLogin }) {
   const [username, setUsername] = useState("");
@@ -10,7 +11,7 @@ function Login({ onLogin }) {
     e.preventDefault();
     setError("");
     try {
-           const res = await fetch("http://localhost:5000/api/users/login", {
+           const res = await fetch(`${API_BASE}/users/login`, {
 
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -24,6 +25,7 @@ function Login({ onLogin }) {
           role: data.user.role,
           name: data.user.name,
           subjects: data.user.subjects || [],
+          token: data.token,
         };
         localStorage.setItem("app_user", JSON.stringify(userInfo));
         onLogin(userInfo);

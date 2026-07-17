@@ -7,28 +7,18 @@ let socket = null;
 
 /**
  * Initialize socket connection
- * @param {string} userId - User ID
- * @param {string} userRole - User role (teacher/student)
+ * @param {string} token - JWT token for socket authentication
  */
-export const initializeSocket = (userId, userRole) => {
+export const initializeSocket = (token) => {
   if (socket) {
     return socket;
   }
 
   socket = io(SOCKET_URL, {
     auth: {
-      userId,
-      userRole,
+      token,
     },
     transports: ["websocket", "polling"],
-  });
-
-  socket.on("connect", () => {
-    console.log("✅ Socket connected:", socket.id);
-  });
-
-  socket.on("disconnect", () => {
-    console.log("❌ Socket disconnected");
   });
 
   socket.on("error", (error) => {
