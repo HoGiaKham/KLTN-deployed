@@ -1,23 +1,28 @@
 import React, { useState } from "react";
-import { FaUser, FaLock } from "react-icons/fa";
+import { FaUser, FaLock, FaSpinner } from "react-icons/fa";
 import { API_BASE } from "../config";
 
 function Login({ onLogin }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  
+  // ✅ Thêm state để quản lý trạng thái loading
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    try {
-           const res = await fetch(`${API_BASE}/users/login`, {
+    setIsLoading(true); // Bắt đầu loading
 
+    try {
+      const res = await fetch(`${API_BASE}/users/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
       });
       const data = await res.json();
+      
       if (res.ok) {
         const userInfo = {
           _id: data.user._id,
@@ -35,6 +40,8 @@ function Login({ onLogin }) {
     } catch (err) {
       console.error("Login error:", err);
       setError("Lỗi kết nối đến server");
+    } finally {
+      setIsLoading(false); // Kết thúc loading dù thành công hay thất bại
     }
   };
 
@@ -61,6 +68,7 @@ function Login({ onLogin }) {
                 onChange={(e) => setUsername(e.target.value)}
                 style={styles.input}
                 required
+                disabled={isLoading} // Khóa input khi đang load
               />
             </div>
 
@@ -73,21 +81,54 @@ function Login({ onLogin }) {
                 onChange={(e) => setPassword(e.target.value)}
                 style={styles.input}
                 required
+                disabled={isLoading} // Khóa input khi đang load
               />
             </div>
 
             {error && <p style={styles.errorText}>{error}</p>}
 
-            <button type="submit" style={styles.loginBtn}>
-              Login
+            {/* ✅ Nút Login với hiệu ứng Loading */}
+            <button 
+              type="submit" 
+              style={{
+                ...styles.loginBtn,
+                opacity: isLoading ? 0.7 : 1,
+                cursor: isLoading ? "not-allowed" : "pointer"
+              }}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px" }}>
+                  <FaSpinner className="spinner-icon" style={{ animation: "spin 1s linear infinite" }} />
+                  Đang đánh thức máy chủ (Khoảng 50s)...
+                </span>
+              ) : (
+                "Login"
+              )}
             </button>
           </form>
 
+          {/* ✅ Khung hướng dẫn Demo cho Nhà tuyển dụng */}
+          <div style={styles.demoBox}>
+            <p style={{ margin: "0 0 5px 0", fontWeight: "600", color: "#8B5CF6" }}>💡 Tài khoản Demo (Dành cho nhà tuyển dụng)</p>
+            <p style={{ margin: 0, fontSize: "14px" }}>Admin: <strong>admin</strong> | Pass: <strong>123456</strong></p>
+          </div>
+
           <p style={styles.footerText}>
-            Lưu ý: Sử dụng tài khoản được cấp bởi quản trị viên.
+            Lưu ý: Bạn cần dùng tài khoản Quản trị viên để cấp phát tài khoản Giáo viên & Học sinh.
           </p>
         </div>
       </div>
+
+      {/* CSS keyframe cho hiệu ứng xoay (có thể để thẳng vào thẻ style ở React) */}
+      <style>
+        {`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}
+      </style>
     </div>
   );
 }
@@ -186,15 +227,9 @@ const styles = {
     color: "#fff",
     fontSize: "18px",
     fontWeight: "600",
-    cursor: "pointer",
     marginTop: "10px",
     transition: "all 0.3s ease",
     boxShadow: "0 10px 25px rgba(139,92,246,0.3)",
-  },
-
-  loginBtnHover: {
-    transform: "translateY(-2px)",
-    boxShadow: "0 15px 30px rgba(139,92,246,0.5)",
   },
 
   errorText: {
@@ -204,17 +239,22 @@ const styles = {
     marginBottom: "10px",
   },
 
-  footerText: {
+  // ✅ Style cho khung hướng dẫn Demo
+  demoBox: {
     marginTop: "25px",
+    padding: "15px",
+    background: "#f3f0ff",
+    border: "1px dashed #8B5CF6",
+    borderRadius: "10px",
     textAlign: "center",
-    fontSize: "14px",
-    color: "#555",
+    color: "#333",
   },
 
-  link: {
-    color: "#8B5CF6",
-    fontWeight: "600",
-    textDecoration: "none",
+  footerText: {
+    marginTop: "20px",
+    textAlign: "center",
+    fontSize: "13px",
+    color: "#777",
   },
 };
 
