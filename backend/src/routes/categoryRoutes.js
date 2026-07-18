@@ -40,16 +40,11 @@ router.get("/:categoryId/questions", async (req, res) => {
 // Endpoint: GET /categories/teacher-subjects/:teacherId
 router.get("/teacher-subjects/:teacherId", async (req, res) => {
   try {
-    console.log("\n✅ [Teacher Subjects Route] Request for teacher ID:", req.params.teacherId);
-    
     // 1. Kiểm tra teacher tồn tại
     const teacher = await User.findById(req.params.teacherId);
     if (!teacher || teacher.role !== "teacher") {
-      console.log("❌ Teacher not found");
       return res.status(404).json({ message: "Teacher not found" });
     }
-
-    console.log("✅ Teacher found:", teacher.name);
 
     // 2. Lấy TeachingAssignment của teacher
     const assignments = await TeachingAssignment.find({ 
@@ -58,10 +53,7 @@ router.get("/teacher-subjects/:teacherId", async (req, res) => {
       .populate("subject", "_id name description")
       .populate("class", "_id className");
 
-    console.log("📋 Found assignments:", assignments.length);
-
     if (assignments.length === 0) {
-      console.log("⚠️ Teacher has no teaching assignments");
       return res.json([]);
     }
 
@@ -82,15 +74,12 @@ router.get("/teacher-subjects/:teacherId", async (req, res) => {
     });
 
     const subjectIds = Object.keys(subjectMap).map(id => id);
-    console.log("🔎 Subject IDs:", subjectIds);
 
     // 4. Lấy categories của các subject này (createdBy teacher)
     const categories = await Category.find({
       subjectId: { $in: subjectIds },
       createdBy: req.params.teacherId  // ← Chỉ categories của teacher này
     }).sort({ createdAt: -1 });
-
-    console.log("📦 Found categories:", categories.length);
 
     // 5. Map categories vào subjects
     categories.forEach(cat => {
@@ -106,7 +95,6 @@ router.get("/teacher-subjects/:teacherId", async (req, res) => {
 
     // 6. Trả về array subjects + categories
     const result = Object.values(subjectMap);
-    console.log("✅ Returning", result.length, "subjects with categories");
     
     res.json(result);
   } catch (err) {
@@ -119,46 +107,34 @@ router.get("/teacher-subjects/:teacherId", async (req, res) => {
 // FIX v3: Lấy categories nhưng filter theo teacher (createdBy)
 router.get("/teacher/:teacherId", async (req, res) => {
   try {
-    console.log("\n🔍 [Teacher Route] Request for teacher ID:", req.params.teacherId);
-    
     // Kiểm tra teacher tồn tại
     const teacher = await User.findById(req.params.teacherId);
     if (!teacher || teacher.role !== "teacher") {
-      console.log("❌ Teacher not found or invalid role");
       return res.status(404).json({ message: "Teacher not found" });
     }
-
-    console.log("✅ Teacher found:", teacher.name);
-    console.log("📚 Teacher subjects (from user.subjects):", teacher.subjects);
 
     const teacherSubjectNames = teacher.subjects || [];
     
     if (teacherSubjectNames.length === 0) {
-      console.log("⚠️ Teacher has no subjects");
       return res.json([]);
     }
 
     // Tìm Subject theo TÊN (từ user.subjects)
     const subjects = await Subject.find({ name: { $in: teacherSubjectNames } });
-    console.log("🔎 Found subjects:", subjects.map(s => ({ _id: s._id, name: s.name })));
 
     if (subjects.length === 0) {
-      console.log("⚠️ No subjects found in DB for names:", teacherSubjectNames);
       return res.json([]);
     }
 
     const subjectIds = subjects.map(s => s._id.toString());
-    console.log("🆔 Subject IDs for this teacher:", subjectIds);
 
     // ⭐ FIX v3: Lấy categories của những subject này
     // NHƯNG chỉ lấy categories được tạo bởi teacher này (createdBy === teacherId)
     const categories = await Category.find({ 
       subjectId: { $in: subjectIds },
-      createdBy: req.params.teacherId  // ← ⭐ KIỂM TRA QUỀ
+      createdBy: req.params.teacherId  // ← ⭐ KIỂM TRA QUYỀN
     }).sort({ createdAt: -1 });
     
-    console.log("📦 Found categories (created by this teacher):", categories.length);
-
     // Tạo map categories theo subjectId
     const categoryBySubject = {};
     categories.forEach(cat => {
@@ -179,7 +155,6 @@ router.get("/teacher/:teacherId", async (req, res) => {
       isSubject: true
     }));
 
-    console.log("✅ Returning", result.length, "subjects with categories (filtered by teacher)");
     res.json(result);
   } catch (err) {
     console.error("❌ Error in teacher route:", err);
@@ -190,21 +165,17 @@ router.get("/teacher/:teacherId", async (req, res) => {
 // ✅ GET danh mục theo subject ID - FIX #3: Thêm filter teacherId
 router.get("/:subjectId", async (req, res) => {
   try {
-    console.log("\n📂 [Subject Route] Request for subject:", req.params.subjectId);
     const { teacherId } = req.query;
-    console.log("🔑 Teacher ID (optional):", teacherId);
     
     // ✅ Nếu có teacherId → chỉ lấy categories của teacher này
     let query = { subjectId: req.params.subjectId };
     
     if (teacherId) {
       query.createdBy = teacherId;
-      console.log("🔒 Filtering by teacher:", teacherId);
     }
     
     const categories = await Category.find(query).sort({ createdAt: -1 });
     
-    console.log("📦 Found categories:", categories.length);
     res.json(categories);
   } catch (err) {
     console.error("❌ Error:", err);
@@ -238,13 +209,10 @@ router.post("/:subjectId", async (req, res) => {
       });
 
       if (!hasAssignment) {
-        console.log("❌ Teacher not assigned to this subject");
         return res.status(403).json({ 
           message: "Bạn không được phân công dạy môn học này" 
         });
       }
-
-      console.log("✅ Teacher has assignment for this subject");
     }
 
     const category = new Category({

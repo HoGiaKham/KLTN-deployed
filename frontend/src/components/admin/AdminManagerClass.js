@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo, useRef } from "react";
 import axios from "axios";
 import * as XLSX from "xlsx";
 import Modal from "../common/Modal";
+import ModalOverlay from "../common/ModalOverlay";
 import "../../styles/AdminManagerClass.css";
 
 import { API_BASE } from "../../config";
@@ -33,14 +34,14 @@ function AdminManagerClass() {
   const fileInputExcelRef = useRef(null);
 
   const [conflictError, setConflictError] = useState("");
-const [modal, setModal] = useState({
-  show: false,
-  type: "info",
-  title: "",
-  message: "",
-  onConfirm: null,
-  showCancel: false
-});
+  const [modal, setModal] = useState({
+    show: false,
+    type: "info",
+    title: "",
+    message: "",
+    onConfirm: null,
+    showCancel: false
+  });
 
   const normalizeString = (str) =>
     str?.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() || "";
@@ -59,18 +60,18 @@ const [modal, setModal] = useState({
         axios.get(`${API_BASE}/semesters`),
       ]);
 
-const classesWithInfo = classRes.data.map((cls) => {
-  const assign = assignRes.data.find(
-    (a) => a.class?._id === cls._id && a.subject && a.teacher
-  );
+      const classesWithInfo = classRes.data.map((cls) => {
+        const assign = assignRes.data.find(
+          (a) => a.class?._id === cls._id && a.subject && a.teacher
+        );
 
-  return {
-    ...cls,
-    subject: assign?.subject || null,
-    teacher: assign?.teacher || null,
-    semester: cls.semester || null,
-  };
-});
+        return {
+          ...cls,
+          subject: assign?.subject || null,
+          teacher: assign?.teacher || null,
+          semester: cls.semester || null,
+        };
+      });
 
 
       setClasses(classesWithInfo);
@@ -198,109 +199,109 @@ const classesWithInfo = classRes.data.map((cls) => {
     setShowAddClassModal(false);
   };
 
-const handleDeleteClick = async (cls) => {
-  try {
-    const res = await axios.get(`${API_BASE}/practice-exams?classId=${cls._id}`);
-    const hasPractice = res.data.length > 0;
+  const handleDeleteClick = async (cls) => {
+    try {
+      const res = await axios.get(`${API_BASE}/practice-exams?classId=${cls._id}`);
+      const hasPractice = res.data.length > 0;
 
-    setModal({
-      show: true,
-      type: "confirm",
-      title: "Xác nhận xóa lớp",
-      message: hasPractice
-        ? `Bạn có chắc muốn xóa lớp "${cls.className}"?\n\n⚠ Xóa sẽ xóa mất toàn bộ thông tin liên quan đến lớp này!`
-        : `Bạn có chắc muốn xóa lớp "${cls.className}"?`,
-      onConfirm: () => confirmDelete(cls._id),
-      showCancel: true,
-      confirmText: "Xóa lớp",
-      cancelText: "Hủy"
+      setModal({
+        show: true,
+        type: "confirm",
+        title: "Xác nhận xóa lớp",
+        message: hasPractice
+          ? `Bạn có chắc muốn xóa lớp "${cls.className}"?\n\n⚠ Xóa sẽ xóa mất toàn bộ thông tin liên quan đến lớp này!`
+          : `Bạn có chắc muốn xóa lớp "${cls.className}"?`,
+        onConfirm: () => confirmDelete(cls._id),
+        showCancel: true,
+        confirmText: "Xóa lớp",
+        cancelText: "Hủy"
+      });
+    } catch (err) {
+      setModal({
+        show: true,
+        type: "error",
+        title: "Lỗi",
+        message: "Không thể kiểm tra đề luyện tập!",
+        onConfirm: () => setModal({ ...modal, show: false }),
+        showCancel: false
+      });
+    }
+  };
+
+  const confirmDelete = async (classId) => {
+    setModal({ ...modal, show: false });
+    try {
+      await axios.delete(`${API_BASE}/classes/${classId}`);
+      fetchAllData();
+      setModal({
+        show: true,
+        type: "success",
+        title: "Thành công",
+        message: "Xóa lớp và dữ liệu liên quan thành công!",
+        onConfirm: () => setModal({ ...modal, show: false }),
+        showCancel: false
+      });
+    } catch (err) {
+      setModal({
+        show: true,
+        type: "error",
+        title: "Lỗi",
+        message: "Không thể xóa lớp!",
+        onConfirm: () => setModal({ ...modal, show: false }),
+        showCancel: false
+      });
+    }
+  };
+
+
+  // MỞ MODAL PHÂN SV
+  const openStudentModal = async (cls) => {
+    setSelectedClass(cls);
+    setConflictError("");
+    setImportPreview([]);
+    if (fileInputExcelRef.current) fileInputExcelRef.current.value = "";
+
+    const currentStudents = cls.students?.map(s => s._id) || [];
+    const subjectId = cls.subject?._id || cls.subject;
+
+    const otherClassesSameSubject = classes.filter(
+      c => (c.subject?._id || c.subject) === subjectId && c._id !== cls._id
+    );
+
+    const conflictMap = new Map();
+    otherClassesSameSubject.forEach(otherClass => {
+      otherClass.students?.forEach(s => {
+        const studentId = s._id;
+        if (!conflictMap.has(studentId)) {
+          conflictMap.set(studentId, {
+            name: s.name,
+            className: otherClass.className,
+            subjectId: otherClass.subject?._id || otherClass.subject
+          });
+        }
+      });
     });
-  } catch (err) {
-    setModal({
-      show: true,
-      type: "error",
-      title: "Lỗi",
-      message: "Không thể kiểm tra đề luyện tập!",
-      onConfirm: () => setModal({ ...modal, show: false }),
-      showCancel: false
-    });
-  }
-};
 
-const confirmDelete = async (classId) => {
-  setModal({ ...modal, show: false });
-  try {
-    await axios.delete(`${API_BASE}/classes/${classId}`);
-    fetchAllData();
-    setModal({
-      show: true,
-      type: "success",
-      title: "Thành công",
-      message: "Xóa lớp và dữ liệu liên quan thành công!",
-      onConfirm: () => setModal({ ...modal, show: false }),
-      showCancel: false
-    });
-  } catch (err) {
-    setModal({
-      show: true,
-      type: "error",
-      title: "Lỗi",
-      message: "Không thể xóa lớp!",
-      onConfirm: () => setModal({ ...modal, show: false }),
-      showCancel: false
-    });
-  }
-};
+    // Lọc ra các SV hợp lệ (không trùng môn)
+    const validStudentIds = currentStudents.filter(id => !conflictMap.has(id));
+    setSelectedStudents(validStudentIds);
 
+    // Tạo cảnh báo trùng môn học
+    if (conflictMap.size > 0) {
+      const warnings = Array.from(conflictMap.values())
+        .slice(0, 5)
+        .map(info => {
+          const subjectObj = subjects.find(sub => sub._id === info.subjectId);
+          const subjectName = subjectObj ? subjectObj.name : "Môn học";
+          return `${info.name} đã học môn "${subjectName}" ở lớp ${info.className}`;
+        })
+        .join("\n");
 
-// MỞ MODAL PHÂN SV
-const openStudentModal = async (cls) => {
-  setSelectedClass(cls);
-  setConflictError("");
-  setImportPreview([]);
-  if (fileInputExcelRef.current) fileInputExcelRef.current.value = "";
+      setConflictError(warnings + (conflictMap.size > 5 ? `\n... và ${conflictMap.size - 5} sinh viên khác.` : ""));
+    }
 
-  const currentStudents = cls.students?.map(s => s._id) || [];
-  const subjectId = cls.subject?._id || cls.subject;
-
-  const otherClassesSameSubject = classes.filter(
-    c => (c.subject?._id || c.subject) === subjectId && c._id !== cls._id
-  );
-
-  const conflictMap = new Map();
-  otherClassesSameSubject.forEach(otherClass => {
-    otherClass.students?.forEach(s => {
-      const studentId = s._id;
-      if (!conflictMap.has(studentId)) {
-        conflictMap.set(studentId, {
-          name: s.name,
-          className: otherClass.className,
-          subjectId: otherClass.subject?._id || otherClass.subject
-        });
-      }
-    });
-  });
-
-  // Lọc ra các SV hợp lệ (không trùng môn)
-  const validStudentIds = currentStudents.filter(id => !conflictMap.has(id));
-  setSelectedStudents(validStudentIds);
-
-  // Tạo cảnh báo trùng môn học
-  if (conflictMap.size > 0) {
-    const warnings = Array.from(conflictMap.values())
-      .slice(0, 5)
-      .map(info => {
-        const subjectObj = subjects.find(sub => sub._id === info.subjectId);
-        const subjectName = subjectObj ? subjectObj.name : "Môn học";
-        return `${info.name} đã học môn "${subjectName}" ở lớp ${info.className}`;
-      })
-      .join("\n");
-
-    setConflictError(warnings + (conflictMap.size > 5 ? `\n... và ${conflictMap.size - 5} sinh viên khác.` : ""));
-  }
-
-  setShowStudentModal(true);
-};
+    setShowStudentModal(true);
+  };
 
 
   const handleAssignStudents = async () => {
@@ -354,10 +355,10 @@ const openStudentModal = async (cls) => {
     }));
   };
 
-const getSortArrow = (key) => {
-  if (sortConfig.key !== key) return "⇅";
-  return sortConfig.direction === "asc" ? "▲" : "▼";
-};
+  const getSortArrow = (key) => {
+    if (sortConfig.key !== key) return "⇅";
+    return sortConfig.direction === "asc" ? "▲" : "▼";
+  };
 
   // Filter + Sort classes
   const filteredClasses = useMemo(() => {
@@ -457,76 +458,76 @@ const getSortArrow = (key) => {
     reader.readAsBinaryString(file);
   };
 
-const handleConfirmImport = () => {
-  if (!selectedClass) return;
+  const handleConfirmImport = () => {
+    if (!selectedClass) return;
 
-  const subjectId = selectedClass?.subject?._id || selectedClass?.subject;
-  const currentClassId = selectedClass._id;
-  const max = selectedClass?.maxStudents || 0;
+    const subjectId = selectedClass?.subject?._id || selectedClass?.subject;
+    const currentClassId = selectedClass._id;
+    const max = selectedClass?.maxStudents || 0;
 
-  const errors = []; // lưu lỗi
-  const validStudentIds = [];
+    const errors = []; // lưu lỗi
+    const validStudentIds = [];
 
-  importPreview.forEach((s) => {
-    // Tìm SV trong danh sách users
-    const user = students.find(
-      (u) => u.username === s.username && u.name === s.name
-    );
+    importPreview.forEach((s) => {
+      // Tìm SV trong danh sách users
+      const user = students.find(
+        (u) => u.username === s.username && u.name === s.name
+      );
 
-    if (!user) {
-      errors.push(`Không tìm thấy SV: ${s.username} - ${s.name} (dòng ${s.row})`);
+      if (!user) {
+        errors.push(`Không tìm thấy SV: ${s.username} - ${s.name} (dòng ${s.row})`);
+        return;
+      }
+
+      // Kiểm tra xem SV đã học môn này ở lớp khác chưa
+      const isInOtherClass = classes.some(
+        (c) =>
+          c._id !== currentClassId &&
+          (c.subject?._id || c.subject) === subjectId &&
+          c.students?.some((st) => st._id === user._id)
+      );
+
+      if (isInOtherClass) {
+        errors.push(`SV ${user.username} - ${user.name} đã học môn này ở lớp khác!`);
+        return;
+      }
+
+      validStudentIds.push(user._id);
+    });
+
+    if (errors.length > 0) {
+      setModal({
+        show: true,
+        type: "error",
+        title: "Lỗi import",
+        message: errors.join("\n"),
+        onConfirm: () => setModal({ ...modal, show: false }),
+        showCancel: false
+      });
       return;
     }
 
-    // Kiểm tra xem SV đã học môn này ở lớp khác chưa
-    const isInOtherClass = classes.some(
-      (c) =>
-        c._id !== currentClassId &&
-        (c.subject?._id || c.subject) === subjectId &&
-        c.students?.some((st) => st._id === user._id)
-    );
 
-    if (isInOtherClass) {
-      errors.push(`SV ${user.username} - ${user.name} đã học môn này ở lớp khác!`);
+    // Merge với danh sách đã chọn
+    const merged = Array.from(new Set([...selectedStudents, ...validStudentIds]));
+
+    if (merged.length > max) {
+      setModal({
+        show: true,
+        type: "warning",
+        title: "Cảnh báo",
+        message: `Tổng SV (${merged.length}) vượt quá giới hạn ${max}!`,
+        onConfirm: () => setModal({ ...modal, show: false }),
+        showCancel: false
+      });
       return;
     }
 
-    validStudentIds.push(user._id);
-  });
 
-if (errors.length > 0) {
-  setModal({
-    show: true,
-    type: "error",
-    title: "Lỗi import",
-    message: errors.join("\n"),
-    onConfirm: () => setModal({ ...modal, show: false }),
-    showCancel: false
-  });
-  return;
-}
-
-
-  // Merge với danh sách đã chọn
-  const merged = Array.from(new Set([...selectedStudents, ...validStudentIds]));
-
-if (merged.length > max) {
-  setModal({
-    show: true,
-    type: "warning",
-    title: "Cảnh báo",
-    message: `Tổng SV (${merged.length}) vượt quá giới hạn ${max}!`,
-    onConfirm: () => setModal({ ...modal, show: false }),
-    showCancel: false
-  });
-  return;
-}
-
-
-  setSelectedStudents(merged);
-  setImportPreview([]);
-  if (fileInputExcelRef.current) fileInputExcelRef.current.value = "";
-};
+    setSelectedStudents(merged);
+    setImportPreview([]);
+    if (fileInputExcelRef.current) fileInputExcelRef.current.value = "";
+  };
 
 
   const downloadStudentTemplate = () => {
@@ -544,9 +545,8 @@ if (merged.length > max) {
 
   return (
     <div className="admin-classes-container">
-      <h2>Quản lý lớp học</h2>
-
-      <div className="add-class-section">
+      <div className="admin-header-row">
+        <h2>Quản lý lớp học</h2>
         <button className="add-btn" onClick={() => { setSelectedSemester(activeSemesterId); setShowAddClassModal(true); }}>
           Thêm lớp mới
         </button>
@@ -568,92 +568,91 @@ if (merged.length > max) {
         </select>
       </div>
 
-<table className="classes-table">
-  <thead>
-    <tr>
-      <th onClick={() => handleSort("subject")}>
-        Môn học {getSortArrow("subject")}
-      </th>
-      <th onClick={() => handleSort("className")}>
-        Tên lớp {getSortArrow("className")}
-      </th>
-      <th onClick={() => handleSort("semester")}>
-        Học kỳ {getSortArrow("semester")}
-      </th>
-      <th onClick={() => handleSort("teacher")}>
-        Giảng viên {getSortArrow("teacher")}
-      </th>
-      <th onClick={() => handleSort("students")}>
-        Số SV {getSortArrow("students")}
-      </th>
-      <th>Hành động</th>
-    </tr>
-  </thead>
-  <tbody>
-    {filteredClasses.length === 0 ? (
-      <tr>
-        <td colSpan="6" style={{ textAlign: "center", color: "#999" }}>
-          Chưa có lớp nào
-        </td>
-      </tr>
-    ) : (
-      filteredClasses.map((cls) => {
-        const subjectName =
-          subjects.find((s) => s._id === (cls.subject?._id || cls.subject))
-            ?.name || "Chưa gắn";
-        const teacher = users.find(
-          (u) => u._id === (cls.teacher?._id || cls.teacher)
-        );
-        const teacherName = teacher?.name || "Chưa gắn";
-        const teacherAvatar = teacher?.avatar || ""; //
-        const semesterName =
-          semesters.find((s) => s._id === (cls.semester?._id || cls.semester))
-            ?.name || "Chưa gắn";
-
-        return (
-          <tr key={cls._id}>
-            <td>{subjectName}</td>
-            <td>
-              <span>{cls.className}</span>
-
-            </td>
-            <td>{semesterName}</td>
-            <td>
-              <div className="teacher-info">
-                {teacherAvatar && (
-                  <img
-                    src={teacherAvatar}
-                    alt={teacherName}
-                    className="teacher-avatar"
-                  />
-                )}
-                <span>{teacherName}</span>
-              </div>
-            </td>
-            <td>
-              {cls.students?.length || 0}/{cls.maxStudents || 0}
-            </td>
-            <td className="action-buttons">
-              <button onClick={() => openStudentModal(cls)}>Phân SV</button>
-<button className="delete" onClick={() => handleDeleteClick(cls)}>
-  Xóa
-</button>
-            </td>
+      <table className="classes-table">
+        <thead>
+          <tr>
+            <th onClick={() => handleSort("subject")}>
+              Môn học {getSortArrow("subject")}
+            </th>
+            <th onClick={() => handleSort("className")}>
+              Tên lớp {getSortArrow("className")}
+            </th>
+            <th onClick={() => handleSort("semester")}>
+              Học kỳ {getSortArrow("semester")}
+            </th>
+            <th onClick={() => handleSort("teacher")}>
+              Giảng viên {getSortArrow("teacher")}
+            </th>
+            <th onClick={() => handleSort("students")}>
+              Số SV {getSortArrow("students")}
+            </th>
+            <th>Hành động</th>
           </tr>
-        );
-      })
-    )}
-  </tbody>
-</table>
+        </thead>
+        <tbody>
+          {filteredClasses.length === 0 ? (
+            <tr>
+              <td colSpan="6" style={{ textAlign: "center", color: "#999" }}>
+                Chưa có lớp nào
+              </td>
+            </tr>
+          ) : (
+            filteredClasses.map((cls) => {
+              const subjectName =
+                subjects.find((s) => s._id === (cls.subject?._id || cls.subject))
+                  ?.name || "Chưa gắn";
+              const teacher = users.find(
+                (u) => u._id === (cls.teacher?._id || cls.teacher)
+              );
+              const teacherName = teacher?.name || "Chưa gắn";
+              const teacherAvatar = teacher?.avatar || ""; //
+              const semesterName =
+                semesters.find((s) => s._id === (cls.semester?._id || cls.semester))
+                  ?.name || "Chưa gắn";
+
+              return (
+                <tr key={cls._id}>
+                  <td>{subjectName}</td>
+                  <td>
+                    <span>{cls.className}</span>
+
+                  </td>
+                  <td>{semesterName}</td>
+                  <td>
+                    <div className="teacher-info">
+                      {teacherAvatar && (
+                        <img
+                          src={teacherAvatar}
+                          alt={teacherName}
+                          className="teacher-avatar"
+                        />
+                      )}
+                      <span>{teacherName}</span>
+                    </div>
+                  </td>
+                  <td>
+                    {cls.students?.length || 0}/{cls.maxStudents || 0}
+                  </td>
+                  <td className="action-buttons">
+                    <button onClick={() => openStudentModal(cls)}>Phân SV</button>
+                    <button className="delete" onClick={() => handleDeleteClick(cls)}>
+                      Xóa
+                    </button>
+                  </td>
+                </tr>
+              );
+            })
+          )}
+        </tbody>
+      </table>
 
 
 
       {/* Modal thêm lớp */}
-{showAddClassModal && (
-  <div className="modal">
-    <div className="modal-content" style={{ position: "relative" }}>
-
-      <h3>Thêm lớp mới</h3>
+      {showAddClassModal && (
+        <ModalOverlay onClose={resetAddModal}>
+          <div style={{ position: "relative" }}>
+            <h3>Thêm lớp mới</h3>
 
             <input type="text" value={newClassName} onChange={(e) => setNewClassName(e.target.value)} placeholder="VD: Lớp KTPM17A" />
             <select value={selectedSubject} onChange={(e) => { setSelectedSubject(e.target.value); setSelectedTeacher(""); }}>
@@ -689,178 +688,176 @@ if (merged.length > max) {
               <button onClick={resetAddModal}>Hủy</button>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
 
       {/* Modal phân SV */}
-{showStudentModal && (
-  <div className="modal">
-    <div className="modal-content modal-large" style={{ position: "relative" }}>
+      {showStudentModal && (
+        <ModalOverlay onClose={() => { setShowStudentModal(false); setConflictError(""); setImportPreview([]); }} contentClassName="modal-large">
 
 
 
-<h3 style={{ textAlign: "center", marginBottom: "10px" }}>
-  Phân công sinh viên cho <span style={{ color: "#1a73e8" }}>{selectedClass?.className}</span>
-</h3>
+          <h3 style={{ textAlign: "center", marginBottom: "10px" }}>
+            Phân công sinh viên cho <span style={{ color: "#1a73e8" }}>{selectedClass?.className}</span>
+          </h3>
 
-<div
-  style={{
-    display: "flex",
-    justifyContent: "center",
-    gap: "10px",
-    marginBottom: "15px",
-  }}
->
-  <button
-    onClick={() => fileInputExcelRef.current?.click()}
-    style={{
-      fontSize: "13px",
-      padding: "6px 12px",
-      background: "#0d6efd",
-      color: "white",
-      border: "none",
-      borderRadius: "6px",
-      cursor: "pointer",
-    }}
-  >
-    Import Excel
-  </button>
-
-  <button
-    onClick={downloadStudentTemplate}
-    style={{
-      fontSize: "13px",
-      padding: "6px 12px",
-      background: "#6c757d",
-      color: "white",
-      border: "none",
-      borderRadius: "6px",
-      cursor: "pointer",
-    }}
-  >
-    Tải mẫu
-  </button>
-</div>
-
-
-            <input
-              ref={fileInputExcelRef}
-              type="file"
-              accept=".xlsx,.xls"
-              onChange={handleExcelFileChange}
-              style={{ display: "none" }}
-            />
-
-{importPreview.length > 0 && (
-  <div className="import-preview-container">
-    <div className="import-preview-header">
-      <div className="preview-info">
-        <strong>Preview import</strong>
-        <span className="preview-count">({importPreview.length} sinh viên)</span>
-      </div>
-      <div className="preview-actions">
-        <button
-          className="confirm-import-btn"
-          onClick={handleConfirmImport}
-        >
-          Xác nhận
-        </button>
-        <button
-          className="cancel-import-btn"
-          onClick={() => {
-            setImportPreview([]);
-            if (fileInputExcelRef.current) fileInputExcelRef.current.value = "";
-          }}
-        >
-          Hủy
-        </button>
-      </div>
-    </div>
-    <div className="import-preview-list">
-      {importPreview.map((student, index) => (
-        <div key={index} className="preview-student-item">
-          <div className="student-info">
-            <span className="student-username">{student.username}</span>
-            <span className="student-name"> - {student.name}</span>
-          </div>
-        </div>
-      ))}
-    </div>
-  </div>
-)}
-
-            {/* CẢNH BÁO TRÙNG MÔN */}
-            {conflictError && (
-              <div style={{
-                background: "#ffebee",
-                color: "#c62828",
-                padding: "12px",
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              gap: "10px",
+              marginBottom: "15px",
+            }}
+          >
+            <button
+              onClick={() => fileInputExcelRef.current?.click()}
+              style={{
+                fontSize: "13px",
+                padding: "6px 12px",
+                background: "#0d6efd",
+                color: "white",
+                border: "none",
                 borderRadius: "6px",
-                marginBottom: "15px",
-                fontSize: "14px",
-                whiteSpace: "pre-line",
-                border: "1px solid #ffcdd2"
-              }}>
-                <strong>Lưu ý:</strong><br />
-                {conflictError}
-              </div>
-            )}
+                cursor: "pointer",
+              }}
+            >
+              Import Excel
+            </button>
 
-            <div style={{ marginBottom: "10px", fontSize: "14px", color: "#555" }}>
-              Đã chọn: <strong>{selectedStudents.length}</strong> / Tối đa: <strong>{selectedClass?.maxStudents || 0}</strong>
-              {selectedStudents.length > (selectedClass?.maxStudents || 0) && (
-                <span style={{ color: "red", marginLeft: "8px" }}>(Vượt quá giới hạn!)</span>
-              )}
-            </div>
-
-            <input
-              type="text"
-              placeholder="Tìm sinh viên..."
-              value={studentSearch}
-              onChange={(e) => setStudentSearch(e.target.value)}
-              style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
-            />
-
-            <div className="students-list">
-              {filteredStudents.length === 0 ? (
-                <p style={{ color: "#999", textAlign: "center", margin: "20px 0" }}>
-                  {studentSearch ? "Không tìm thấy sinh viên" : "Tất cả sinh viên đã học môn này ở lớp khác"}
-                </p>
-              ) : (
-                filteredStudents.map((s) => (
-                  <label key={s._id} style={{ display: "flex", marginLeft: "25px", padding: "8px 0", cursor: "pointer" }}>
-                    <input
-                      type="checkbox"
-                      checked={selectedStudents.includes(s._id)}
-                      onChange={(e) => {
-                        setSelectedStudents((prev) =>
-                          e.target.checked ? [...prev, s._id] : prev.filter((id) => id !== s._id)
-                        );
-                      }}
-                    />
-                    <strong>{s.name}</strong> ({s.username})
-                  </label>
-                ))
-              )}
-            </div>
-
-            <div className="modal-actions">
-              <button
-                onClick={handleAssignStudents}
-                disabled={selectedStudents.length > (selectedClass?.maxStudents || 0)}
-                style={{
-                  opacity: selectedStudents.length > (selectedClass?.maxStudents || 0) ? 0.5 : 1,
-                  cursor: selectedStudents.length > (selectedClass?.maxStudents || 0) ? "not-allowed" : "pointer",
-                }}
-              >
-                Xác nhận
-              </button>
-              <button onClick={() => { setShowStudentModal(false); setConflictError(""); setImportPreview([]); }}>
-                Hủy
-              </button>
-            </div>
+            <button
+              onClick={downloadStudentTemplate}
+              style={{
+                fontSize: "13px",
+                padding: "6px 12px",
+                background: "#6c757d",
+                color: "white",
+                border: "none",
+                borderRadius: "6px",
+                cursor: "pointer",
+              }}
+            >
+              Tải mẫu
+            </button>
           </div>
-        </div>
+
+
+          <input
+            ref={fileInputExcelRef}
+            type="file"
+            accept=".xlsx,.xls"
+            onChange={handleExcelFileChange}
+            style={{ display: "none" }}
+          />
+
+          {importPreview.length > 0 && (
+            <div className="import-preview-container">
+              <div className="import-preview-header">
+                <div className="preview-info">
+                  <strong>Preview import</strong>
+                  <span className="preview-count">({importPreview.length} sinh viên)</span>
+                </div>
+                <div className="preview-actions">
+                  <button
+                    className="confirm-import-btn"
+                    onClick={handleConfirmImport}
+                  >
+                    Xác nhận
+                  </button>
+                  <button
+                    className="cancel-import-btn"
+                    onClick={() => {
+                      setImportPreview([]);
+                      if (fileInputExcelRef.current) fileInputExcelRef.current.value = "";
+                    }}
+                  >
+                    Hủy
+                  </button>
+                </div>
+              </div>
+              <div className="import-preview-list">
+                {importPreview.map((student, index) => (
+                  <div key={index} className="preview-student-item">
+                    <div className="student-info">
+                      <span className="student-username">{student.username}</span>
+                      <span className="student-name"> - {student.name}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* CẢNH BÁO TRÙNG MÔN */}
+          {conflictError && (
+            <div style={{
+              background: "#ffebee",
+              color: "#c62828",
+              padding: "12px",
+              borderRadius: "6px",
+              marginBottom: "15px",
+              fontSize: "14px",
+              whiteSpace: "pre-line",
+              border: "1px solid #ffcdd2"
+            }}>
+              <strong>Lưu ý:</strong><br />
+              {conflictError}
+            </div>
+          )}
+
+          <div style={{ marginBottom: "10px", fontSize: "14px", color: "#555" }}>
+            Đã chọn: <strong>{selectedStudents.length}</strong> / Tối đa: <strong>{selectedClass?.maxStudents || 0}</strong>
+            {selectedStudents.length > (selectedClass?.maxStudents || 0) && (
+              <span style={{ color: "red", marginLeft: "8px" }}>(Vượt quá giới hạn!)</span>
+            )}
+          </div>
+
+          <input
+            type="text"
+            placeholder="Tìm sinh viên..."
+            value={studentSearch}
+            onChange={(e) => setStudentSearch(e.target.value)}
+            style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
+          />
+
+          <div className="students-list">
+            {filteredStudents.length === 0 ? (
+              <p style={{ color: "#999", textAlign: "center", margin: "20px 0" }}>
+                {studentSearch ? "Không tìm thấy sinh viên" : "Tất cả sinh viên đã học môn này ở lớp khác"}
+              </p>
+            ) : (
+              filteredStudents.map((s) => (
+                <label key={s._id} style={{ display: "flex", marginLeft: "25px", padding: "8px 0", cursor: "pointer" }}>
+                  <input
+                    type="checkbox"
+                    checked={selectedStudents.includes(s._id)}
+                    onChange={(e) => {
+                      setSelectedStudents((prev) =>
+                        e.target.checked ? [...prev, s._id] : prev.filter((id) => id !== s._id)
+                      );
+                    }}
+                  />
+                  <strong>{s.name}</strong> ({s.username})
+                </label>
+              ))
+            )}
+          </div>
+
+          <div className="modal-actions">
+            <button
+              onClick={handleAssignStudents}
+              disabled={selectedStudents.length > (selectedClass?.maxStudents || 0)}
+              style={{
+                opacity: selectedStudents.length > (selectedClass?.maxStudents || 0) ? 0.5 : 1,
+                cursor: selectedStudents.length > (selectedClass?.maxStudents || 0) ? "not-allowed" : "pointer",
+              }}
+            >
+              Xác nhận
+            </button>
+            <button onClick={() => { setShowStudentModal(false); setConflictError(""); setImportPreview([]); }}>
+              Hủy
+            </button>
+          </div>
+        </ModalOverlay>
       )}
 
       <Modal

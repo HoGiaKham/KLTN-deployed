@@ -46,6 +46,19 @@ function PracticeExamPage() {
     return () => clearInterval(interval);
   }, []);
 
+  // Lắng nghe phím ESC để đóng Modal tạo/sửa đề luyện tập
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape" && isModalOpen) {
+        setIsModalOpen(false);
+        resetForm(); // Gọi hàm này để xóa dữ liệu đang nhập dở
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isModalOpen]);
+  
   // Load dữ liệu giáo viên: môn + categories do chính mình tạo
   useEffect(() => {
     const loadTeacherData = async () => {
@@ -363,171 +376,169 @@ const handleSaveExam = async () => {
         </button>
       </div>
 
-      <ul key={refreshKey}>
+      <div className="exam-list" key={refreshKey}>
         {exams.length === 0 ? (
-          <p style={{ textAlign: "center", color: "#999", padding: "40px" }}>
+          <p className="no-exams-message">
             Chưa có đề luyện tập nào. Nhấn nút "+" để tạo đề mới.
           </p>
         ) : (
           exams.map((exam) => {
-            // refreshKey triggers recalculation of exam status every 30 seconds
             const examStatus = getExamStatus(exam);
             return (
-            <li
+            <div
               key={exam._id}
-              className="exam-item"
+              className="exam-card"
               onClick={() => navigate(`/practice-exam-detail/${exam._id}`)}
             >
-              <div className="exam-item-header">
-                <div className="exam-info-left">
-                  <span className="exam-title">
+              <div className="exam-header">
+                <div className="exam-title-row">
+                  <h4 className="exam-title">
                     {exam.title}
-<span style={{ color: "#528fd1", fontWeight: "500", fontStyle: "italic", marginLeft: "8px" }}>
-  - {exam.subject?.name}
-  {exam.classes && exam.classes.length > 0 && ` - Lớp: ${exam.classes.map(c => c.className).join(', ')}`}
-</span>
-                  </span>
-                  <div className="exam-metadata">
-                    <span className={`exam-status ${examStatus.className}`}>
-                      {examStatus.status}
-                    </span>
-                    <span className="exam-time">Mở: {formatDateTime(exam.openTime)}</span>
-                  </div>
+                  </h4>
                 </div>
-                <div className="exam-actions">
-                  <button className="exam-btn edit-btn" onClick={(e) => handleEditExam(e, exam)}>
-                    Sửa
-                  </button>
-                  <button className="exam-btn delete-btn" onClick={(e) => handleDeleteExam(e, exam)}>
-                    Xóa
-                  </button>
-                </div>
+                <span className={`status-badge ${examStatus.className}`}>{examStatus.status}</span>
               </div>
-            </li>
+
+              <div className="exam-info">
+                <span className="info-text">📚 Môn: {exam.subject?.name}</span>
+                {exam.classes && exam.classes.length > 0 && (
+                  <span className="info-text">🏫 Lớp: {exam.classes.map(c => c.className).join(', ')}</span>
+                )}
+                <span className="info-text">🕐 Mở: {formatDateTime(exam.openTime)}</span>
+              </div>
+
+              <div className="exam-actions">
+                <button className="btn-small btn-blue" onClick={(e) => { e.stopPropagation(); handleEditExam(e, exam); }}>
+                  ✏️
+                </button>
+                <button className="btn-small btn-red" onClick={(e) => { e.stopPropagation(); handleDeleteExam(e, exam); }}>
+                  🗑️
+                </button>
+              </div>
+            </div>
             );
           })
         )}
-      </ul>
+      </div>
 
       {/* Modal tạo/sửa đề */}
       {isModalOpen && (
         <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h4>{isEditMode ? "Chỉnh sửa đề" : "Tạo đề luyện tập mới"}</h4>
+              <h3>{isEditMode ? "Chỉnh sửa đề" : "Tạo đề luyện tập mới"}</h3>
               <button className="modal-close-btn" onClick={() => { setIsModalOpen(false); resetForm(); }}>
                 ×
               </button>
             </div>
 
-{/* Form */}
-<div className="form-group">
-  <label>Môn học</label>
-  <select value={selectedSubject} onChange={(e) => setSelectedSubject(e.target.value)}>
-    <option value="">-- Chọn môn học --</option>
-    {teacherData
-      .slice() // tạo bản sao tránh mutate state gốc
-      .sort((a, b) => a.name.localeCompare(b.name))
-      .map((s) => (
-        <option key={s._id} value={s._id}>{s.name}</option>
-      ))}
-  </select>
-</div>
-
-
-
-{!isEditMode && (
-  <div className="form-group">
-    <label>Lớp học</label>
-    {classes.length === 0 ? (
-      <p style={{ color: "#999", fontStyle: "italic" }}>Chưa có lớp nào được phân công</p>
-    ) : (
-      <div className="class-option-container">
-        {classes
-          .slice()
-          .sort((a, b) => a.className.localeCompare(b.className))
-          .map((cls) => (
-            <div
-              key={cls._id}
-              className={`class-option ${selectedClasses.includes(cls._id) ? "selected" : ""}`}
-              onClick={() => {
-                setSelectedClasses(prev =>
-                  prev.includes(cls._id)
-                    ? prev.filter(id => id !== cls._id)
-                    : [...prev, cls._id]
-                );
-              }}
-            >
-              <input type="checkbox" checked={selectedClasses.includes(cls._id)} readOnly />
-              <span>{cls.className}</span>
-            </div>
-          ))}
-      </div>
-    )}
-  </div>
-)}
-
-
-            {selectedSemester && !isEditMode && (
+            <div className="modal-body">
+              {/* Form */}
               <div className="form-group">
-                <label>Học kỳ</label>
-                <input type="text" value={selectedSemester.name || "Chưa xác định"} readOnly style={{ background: "#f9f9f9" }} />
+                <label>Môn học</label>
+                <select value={selectedSubject} onChange={(e) => setSelectedSubject(e.target.value)}>
+                  <option value="">-- Chọn môn học --</option>
+                  {teacherData
+                    .slice() // tạo bản sao tránh mutate state gốc
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .map((s) => (
+                      <option key={s._id} value={s._id}>{s.name}</option>
+                    ))}
+                </select>
               </div>
-            )}
 
-            <div className="form-group">
-              <label>Chương</label>
-              {!selectedSubject ? (
-                <p style={{ color: "#666" }}>Vui lòng chọn môn học trước</p>
-              ) : categories.length === 0 ? (
-                <p style={{ color: "#999", fontStyle: "italic" }}>Bạn chưa tạo chương nào cho môn này</p>
-              ) : (
-                <div className="category-option-container">
-                  {categories.map((c) => (
-                    <div
-                      key={c._id}
-                      className={`category-option ${selectedCategories.includes(c._id) ? "selected" : ""}`}
-                      onClick={() => {
-                        setSelectedCategories(prev =>
-                          prev.includes(c._id)
-                            ? prev.filter(id => id !== c._id)
-                            : [...prev, c._id]
-                        );
-                      }}
-                    >
-                      <input type="checkbox" checked={selectedCategories.includes(c._id)} readOnly />
-                      <span>{c.name}</span>
+              {!isEditMode && (
+                <div className="form-group">
+                  <label>Lớp học</label>
+                  {classes.length === 0 ? (
+                    <p style={{ color: "#999", fontStyle: "italic" }}>Chưa có lớp nào được phân công</p>
+                  ) : (
+                    <div className="class-option-container">
+                      {classes
+                        .slice()
+                        .sort((a, b) => a.className.localeCompare(b.className))
+                        .map((cls) => (
+                          <div
+                            key={cls._id}
+                            className={`class-option ${selectedClasses.includes(cls._id) ? "selected" : ""}`}
+                            onClick={() => {
+                              setSelectedClasses(prev =>
+                                prev.includes(cls._id)
+                                  ? prev.filter(id => id !== cls._id)
+                                  : [...prev, cls._id]
+                              );
+                            }}
+                          >
+                            <input type="checkbox" checked={selectedClasses.includes(cls._id)} readOnly />
+                            <span>{cls.className}</span>
+                          </div>
+                        ))}
                     </div>
-                  ))}
+                  )}
                 </div>
               )}
+
+              {selectedSemester && !isEditMode && (
+                <div className="form-group">
+                  <label>Học kỳ</label>
+                  <input type="text" value={selectedSemester.name || "Chưa xác định"} readOnly style={{ background: "#f9f9f9" }} />
+                </div>
+              )}
+
+              <div className="form-group">
+                <label>Chương</label>
+                {!selectedSubject ? (
+                  <p style={{ color: "#666" }}>Vui lòng chọn môn học trước</p>
+                ) : categories.length === 0 ? (
+                  <p style={{ color: "#999", fontStyle: "italic" }}>Bạn chưa tạo chương nào cho môn này</p>
+                ) : (
+                  <div className="category-option-container">
+                    {categories.map((c) => (
+                      <div
+                        key={c._id}
+                        className={`category-option ${selectedCategories.includes(c._id) ? "selected" : ""}`}
+                        onClick={() => {
+                          setSelectedCategories(prev =>
+                            prev.includes(c._id)
+                              ? prev.filter(id => id !== c._id)
+                              : [...prev, c._id]
+                          );
+                        }}
+                      >
+                        <input type="checkbox" checked={selectedCategories.includes(c._id)} readOnly />
+                        <span>{c.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label>Tên đề</label>
+                <input
+                  type="text"
+                  value={examName}
+                  onChange={(e) => setExamName(e.target.value)}
+                  placeholder="Ví dụ: Đề ôn tập chương 1 - 3"
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Thời gian mở (tùy chọn)</label>
+                <input
+                  type="datetime-local"
+                  value={openTime}
+                  min={new Date().toISOString().slice(0, 16)} // ngày hiện tại trở đi
+                  onChange={(e) => setOpenTime(e.target.value)}
+                />
+              </div>
             </div>
 
-            <div className="form-group">
-              <label>Tên đề</label>
-              <input
-                type="text"
-                value={examName}
-                onChange={(e) => setExamName(e.target.value)}
-                placeholder="Ví dụ: Đề ôn tập chương 1 - 3"
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Thời gian mở (tùy chọn)</label>
-<input
-  type="datetime-local"
-  value={openTime}
-  min={new Date().toISOString().slice(0, 16)} // ngày hiện tại trở đi
-  onChange={(e) => setOpenTime(e.target.value)}
-/>
-            </div>
-
-            <div style={{ marginTop: "20px", display: "flex", gap: "10px" }}>
-              <button onClick={handleSaveExam} className="save-btn" style={{ flex: 1 }}>
+            <div className="modal-footer">
+              <button onClick={handleSaveExam} className="btn-primary">
                 {isEditMode ? "Cập nhật đề" : "Tạo đề"}
               </button>
-              <button onClick={() => { setIsModalOpen(false); resetForm(); }} style={{ background: "#6c757d" }}>
+              <button onClick={() => { setIsModalOpen(false); resetForm(); }} className="btn-secondary">
                 Hủy
               </button>
             </div>

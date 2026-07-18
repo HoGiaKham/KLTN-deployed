@@ -131,8 +131,7 @@ function Profile() {
   }, [navigate]);
 
   const handleClassClick = (classId) => {
-    const cls = classesMap[classId];
-    if (cls) setSelectedClass(cls);
+    navigate(`/class-detail/${classId}`);
   };
 
   const closeStudentList = () => {

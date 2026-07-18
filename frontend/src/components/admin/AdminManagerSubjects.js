@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Modal from "../common/Modal";
+import ModalOverlay from "../common/ModalOverlay";
 import "../../styles/AdminManagerSubjects.css";
 import { API_BASE } from "../../config";
 
@@ -115,9 +116,8 @@ const handleDelete = async () => {
 
   return (
     <div className="admin-subjects-container">
-      <h2>Quản lý môn học</h2>
-
-      <div className="add-class-section">
+      <div className="admin-header-row">
+        <h2>Quản lý môn học</h2>
         <button className="add-btn" onClick={() => setModalVisible(true)}>
           Thêm môn học
         </button>
@@ -160,21 +160,21 @@ const handleDelete = async () => {
         </tbody>
       </table>
         {successModal && (
-          <div className="modal">
-            <div className="modal-content">
+          <ModalOverlay onClose={() => setSuccessModal(false)}>
+            <>
               <h3>🎉 Thêm môn học thành công!</h3>
               <div className="modal-actions">
                 <button onClick={() => setSuccessModal(false)}>Đóng</button>
               </div>
-            </div>
-          </div>
+            </>
+          </ModalOverlay>
         )}
 
 
       {/* Modal thêm môn học */}
       {modalVisible && (
-        <div className="modal">
-          <div className="modal-content">
+        <ModalOverlay onClose={() => setModalVisible(false)}>
+          <>
             <h3>Thêm môn học mới</h3>
             <input
               type="text"
@@ -190,13 +190,13 @@ const handleDelete = async () => {
                 setNewSubjectName("");
               }}>Hủy</button>
             </div>
-          </div>
-        </div>
+          </>
+        </ModalOverlay>
       )}
 
         {deleteModal && (
-          <div className="modal">
-            <div className="modal-content">
+          <ModalOverlay onClose={() => { setDeleteModal(false); setSubjectToDelete(null); }}>
+            <>
               <h3>Xác nhận xoá môn học</h3>
               <p>
                 Bạn có chắc muốn xoá môn:
@@ -215,20 +215,20 @@ const handleDelete = async () => {
                   Hủy
                 </button>
               </div>
-            </div>
-          </div>
+            </>
+          </ModalOverlay>
         )}
 
 
     {deleteSuccessModal && (
-      <div className="modal">
-        <div className="modal-content">
+      <ModalOverlay onClose={() => setDeleteSuccessModal(false)}>
+        <>
           <h3>Đã xoá môn học thành công!</h3>
           <div className="modal-actions">
             <button onClick={() => setDeleteSuccessModal(false)}>Đóng</button>
           </div>
-        </div>
-      </div>
+        </>
+      </ModalOverlay>
     )}
 
       <Modal

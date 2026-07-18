@@ -58,7 +58,7 @@ function ExamDetailPage() {
 
   const fetchExamData = async () => {
     try {
-      const res = await fetch(`${BASE_URL}/test-exams/${examId}`);
+      const res = await fetch(`${API_BASE}/test-exams/${examId}`);
       if (!res.ok) throw new Error("Không thể load exam");
       const data = await res.json();
       setExamData(data);

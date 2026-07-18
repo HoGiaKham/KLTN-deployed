@@ -15,6 +15,11 @@ const upload = multer({ dest: "uploads/" });
 
 const moment = require('moment-timezone');
 
+const parseVietnamDatetimeLocalToUTC = (dateTimeString) => {
+  if (!dateTimeString) return null;
+  return moment.tz(dateTimeString, 'YYYY-MM-DDTHH:mm', 'Asia/Ho_Chi_Minh').utc().toDate();
+};
+
 router.get("/", async (req, res) => {
   try {
     const { userId, role } = req.query;
@@ -405,18 +410,9 @@ router.post("/", async (req, res) => {
       return res.status(403).json({ error: "Bạn không được phân công dạy môn này cho tất cả các lớp đã chọn" });
     }
 
-    // Convert datetime-local (Vietnam time) to UTC for database storage
-    // datetime-local input "10:35" is Vietnam time (UTC+7)
-    // When server parses it, JS treats it as UTC, but we want to store the actual UTC time
-    // So we need to SUBTRACT 7 hours to correct for the timezone difference
-    // Example: "2025-12-10T10:35" (Vietnam 10:35) = "2025-12-10T03:35Z" (UTC 3:35)
-    const convertVietnamToUTC = (localDateTime) => {
-      if (!localDateTime) return null;
-      const date = new Date(localDateTime);
-      date.setHours(date.getHours() - 7); // Subtract 7 hours to convert Vietnam time to UTC
-      return date;
-    };
-
+    // Convert datetime-local from Vietnam local time to UTC for database storage.
+    // We parse the user-facing datetime-local string explicitly in Asia/Ho_Chi_Minh,
+    // instead of relying on server local timezone.
     const examData = {
       title: title.trim(),
       subject: new mongoose.Types.ObjectId(subject),
@@ -427,8 +423,8 @@ router.post("/", async (req, res) => {
       duration: parseInt(duration) || 60,
       attempts: parseInt(attempts) || 1,
       scorePerQuestion: parseFloat(scorePerQuestion) || 1,
-      openTime: convertVietnamToUTC(openTime),
-      closeTime: convertVietnamToUTC(closeTime),
+      openTime: parseVietnamDatetimeLocalToUTC(openTime),
+      closeTime: parseVietnamDatetimeLocalToUTC(closeTime),
     };
 
     const newExam = new PracticeExam(examData);
@@ -483,14 +479,6 @@ router.put("/:id", async (req, res) => {
     const exam = await PracticeExam.findById(req.params.id);
     if (!exam) return res.status(404).json({ error: "Exam not found" });
 
-    // Convert datetime-local (Vietnam time) to UTC for database storage
-    const convertVietnamToUTC = (localDateTime) => {
-      if (!localDateTime) return null;
-      const date = new Date(localDateTime);
-      date.setHours(date.getHours() - 7); // Subtract 7 hours to convert Vietnam time to UTC
-      return date;
-    };
-
     const updateData = {
       title: req.body.title?.trim(),
       subject: req.body.subject ? new mongoose.Types.ObjectId(req.body.subject) : exam.subject,
@@ -500,8 +488,8 @@ router.put("/:id", async (req, res) => {
       scorePerQuestion: parseFloat(req.body.scorePerQuestion) || exam.scorePerQuestion,
     };
 
-    if (req.body.openTime?.trim()) updateData.openTime = convertVietnamToUTC(req.body.openTime);
-    if (req.body.closeTime?.trim()) updateData.closeTime = convertVietnamToUTC(req.body.closeTime);
+    if (req.body.openTime?.trim()) updateData.openTime = parseVietnamDatetimeLocalToUTC(req.body.openTime);
+    if (req.body.closeTime?.trim()) updateData.closeTime = parseVietnamDatetimeLocalToUTC(req.body.closeTime);
 
     const updatedExam = await PracticeExam.findByIdAndUpdate(req.params.id, updateData, { new: true, runValidators: true })
       .populate('subject', 'name')

@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
+import ModalOverlay from "../common/ModalOverlay";
 import "../../styles/AdminManagerTeacher.css";
 import TeacherDetailModal from "../admin/TeacherDetailModal";
 import { API_BASE } from "../../config";
@@ -161,61 +162,61 @@ const AdminManagerTeacher = () => {
   };
 
   // === THÊM MỚI GIẢNG VIÊN ===
-const handleSaveNewTeacher = async () => {
-  if (!newTeacher.name || !newTeacher.username) {
-    showNotify("Vui lòng nhập đầy đủ họ tên và mã giảng viên!", "error");
-    return;
-  }
+  const handleSaveNewTeacher = async () => {
+    if (!newTeacher.name || !newTeacher.username) {
+      showNotify("Vui lòng nhập đầy đủ họ tên và mã giảng viên!", "error");
+      return;
+    }
 
-  if (newTeacher.subjectIds.length === 0) {
-    showNotify("Vui lòng chọn ít nhất 1 môn dạy!", "error");
-    return;
-  }
+    if (newTeacher.subjectIds.length === 0) {
+      showNotify("Vui lòng chọn ít nhất 1 môn dạy!", "error");
+      return;
+    }
 
-  // === KIỂM TRA TRÙNG MÃ GIẢNG VIÊN ===
-  const isUsernameTaken = teachers.some(
-    (t) => t.username.toLowerCase() === newTeacher.username.toLowerCase()
-  );
-
-  if (isUsernameTaken) {
-    showNotify("Mã giảng viên đã tồn tại! Vui lòng nhập mã khác.", "error");
-    return;
-  }
-
-  setLoading(true);
-  try {
-    const res = await axios.post(`${API_BASE}/users`, {
-      name: newTeacher.name,
-      username: newTeacher.username,
-      password: newTeacher.password,
-      role: "teacher",
-    });
-
-    const teacherId = res.data._id;
-
-    await Promise.all(
-      newTeacher.subjectIds.map((subjectId) =>
-        axios.post(`${API_BASE}/teaching-assignments`, {
-          teacher: teacherId,
-          subject: subjectId,
-        })
-      )
+    // === KIỂM TRA TRÙNG MÃ GIẢNG VIÊN ===
+    const isUsernameTaken = teachers.some(
+      (t) => t.username.toLowerCase() === newTeacher.username.toLowerCase()
     );
 
-    showNotify("Thêm giảng viên và phân công thành công!", "success");
-    setAddModal(false);
+    if (isUsernameTaken) {
+      showNotify("Mã giảng viên đã tồn tại! Vui lòng nhập mã khác.", "error");
+      return;
+    }
 
-    setNewTeacher({ name: "", username: "", password: "123456", subjectIds: [] });
+    setLoading(true);
+    try {
+      const res = await axios.post(`${API_BASE}/users`, {
+        name: newTeacher.name,
+        username: newTeacher.username,
+        password: newTeacher.password,
+        role: "teacher",
+      });
 
-    await fetchTeachers();
-    await fetchAssignments();
-  } catch (err) {
-    console.error("Lỗi khi thêm giảng viên:", err);
-    showNotify(err.response?.data?.message || "Không thể thêm giảng viên!", "error");
-  } finally {
-    setLoading(false);
-  }
-};
+      const teacherId = res.data._id;
+
+      await Promise.all(
+        newTeacher.subjectIds.map((subjectId) =>
+          axios.post(`${API_BASE}/teaching-assignments`, {
+            teacher: teacherId,
+            subject: subjectId,
+          })
+        )
+      );
+
+      showNotify("Thêm giảng viên và phân công thành công!", "success");
+      setAddModal(false);
+
+      setNewTeacher({ name: "", username: "", password: "123456", subjectIds: [] });
+
+      await fetchTeachers();
+      await fetchAssignments();
+    } catch (err) {
+      console.error("Lỗi khi thêm giảng viên:", err);
+      showNotify(err.response?.data?.message || "Không thể thêm giảng viên!", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
   // === FILTER & SORT (giữ nguyên) ===
@@ -265,10 +266,12 @@ const handleSaveNewTeacher = async () => {
 
   return (
     <div className="admin-teacher-container">
-      <h2>Quản lý giảng viên</h2>
-      <button className="add-btn" onClick={() => setAddModal(true)}>
-        + Thêm giảng viên
-      </button>
+      <div className="admin-header-row">
+        <h2>Quản lý giảng viên</h2>
+        <button className="add-btn" onClick={() => setAddModal(true)}>
+          + Thêm giảng viên
+        </button>
+      </div>
 
       <div className="search-filter">
         <input
@@ -317,9 +320,10 @@ const handleSaveNewTeacher = async () => {
           ))}
         </tbody>
       </table>
-{deleteModal.open && (
-        <div className="modal">
-          <div className="modal-content" style={{ maxWidth: "440px", textAlign: "center" }}>
+
+      {deleteModal.open && (
+        <ModalOverlay onClose={() => setDeleteModal({ open: false, teacherId: null, teacherName: "" })}>
+          <div style={{ maxWidth: "440px", textAlign: "center" }}>
             <h3 style={{ color: "#d32f2f", margin: "0 0 16px 0" }}>Xác nhận xóa giảng viên</h3>
             <p style={{ margin: "16px 0", fontSize: "16px" }}>
               Bạn có chắc chắn muốn xóa giảng viên
@@ -346,7 +350,7 @@ const handleSaveNewTeacher = async () => {
               </button>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
 
       {/* Loading overlay (tùy chọn, đẹp hơn) */}
@@ -360,7 +364,7 @@ const handleSaveNewTeacher = async () => {
 
       {/* Giữ nguyên notify modal */}
       {notifyModal.open && (
-        <div className="modal">
+        <ModalOverlay onClose={() => setNotifyModal({ ...notifyModal, open: false })}>
           <div className={`modal-content notify-modal ${notifyModal.type}`}>
             <h3>{notifyModal.type === "success" ? "✔ Thành công" : "✖ Lỗi"}</h3>
             <p>{notifyModal.message}</p>
@@ -370,156 +374,156 @@ const handleSaveNewTeacher = async () => {
               </button>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
+
       {/* Modal thêm mới */}
-{addModal && (
-  <div className="modal">
-    <div className="modal-content" style={{ position: "relative" }}>
+      {addModal && (
+        <ModalOverlay onClose={() => setAddModal(false)}>
+          <div style={{ position: "relative" }}>
 
-      {/* Nút X để đóng modal */}
-      <button
-        onClick={() => setAddModal(false)}
-        style={{
-          position: "absolute",
-          top: "10px",
-          right: "10px",
-          background: "transparent",
-          border: "none",
-          fontSize: "20px",
-          cursor: "pointer",
-          color: "#555"
-        }}
-      >
-        ✖
-      </button>
+            {/* Nút X để đóng modal */}
+            <button
+              onClick={() => setAddModal(false)}
+              style={{
+                position: "absolute",
+                top: "10px",
+                right: "10px",
+                background: "transparent",
+                border: "none",
+                fontSize: "20px",
+                cursor: "pointer",
+                color: "#555"
+              }}
+            >
+              ✖
+            </button>
 
-      <h3>Thêm giảng viên mới</h3>
+            <h3>Thêm giảng viên mới</h3>
 
-      <label>Tên giảng viên:</label>
-      <input
-        value={newTeacher.name}
-        onChange={(e) =>
-          setNewTeacher((prev) => ({ ...prev, name: e.target.value }))
-        }
-      />
+            <label>Tên giảng viên:</label>
+            <input
+              value={newTeacher.name}
+              onChange={(e) =>
+                setNewTeacher((prev) => ({ ...prev, name: e.target.value }))
+              }
+            />
 
-      <label>Mã giảng viên:</label>
-      <input
-        value={newTeacher.username}
-        onChange={(e) =>
-          setNewTeacher((prev) => ({ ...prev, username: e.target.value }))
-        }
-      />
+            <label>Mã giảng viên:</label>
+            <input
+              value={newTeacher.username}
+              onChange={(e) =>
+                setNewTeacher((prev) => ({ ...prev, username: e.target.value }))
+              }
+            />
 
-      <div className="subjects-selection">
-        <p style={{ margin: "0 0 10px 0", fontWeight: "500", color: "#555" }}>
-          Chọn môn dạy <span style={{ color: "#d32f2f" }}>*</span>
-        </p>
-        <div className="subjects-list">
-          {subjects.length === 0 ? (
-            <p style={{ color: "#999", textAlign: "center", padding: "20px", margin: 0 }}>
-              Chưa có môn học nào
-            </p>
-          ) : (
-            subjects.map((s) => (
-              <label key={s._id} className="subject-checkbox-item">
-                <input
-                  type="checkbox"
-                  checked={newTeacher.subjectIds.includes(s._id)}
-                  onChange={() => {
-                    setNewTeacher((prev) => ({
-                      ...prev,
-                      subjectIds: prev.subjectIds.includes(s._id)
-                        ? prev.subjectIds.filter((id) => id !== s._id)
-                        : [...prev.subjectIds, s._id],
-                    }));
-                  }}
-                />
-                <span className="subject-name">{s.name}</span>
-                {s.code && <span className="subject-code">({s.code})</span>}
-              </label>
-            ))
-          )}
-        </div>
-      </div>
+            <div className="subjects-selection">
+              <p style={{ margin: "0 0 10px 0", fontWeight: "500", color: "#555" }}>
+                Chọn môn dạy <span style={{ color: "#d32f2f" }}>*</span>
+              </p>
+              <div className="subjects-list">
+                {subjects.length === 0 ? (
+                  <p style={{ color: "#999", textAlign: "center", padding: "20px", margin: 0 }}>
+                    Chưa có môn học nào
+                  </p>
+                ) : (
+                  subjects.map((s) => (
+                    <label key={s._id} className="subject-checkbox-item">
+                      <input
+                        type="checkbox"
+                        checked={newTeacher.subjectIds.includes(s._id)}
+                        onChange={() => {
+                          setNewTeacher((prev) => ({
+                            ...prev,
+                            subjectIds: prev.subjectIds.includes(s._id)
+                              ? prev.subjectIds.filter((id) => id !== s._id)
+                              : [...prev.subjectIds, s._id],
+                          }));
+                        }}
+                      />
+                      <span className="subject-name">{s.name}</span>
+                      {s.code && <span className="subject-code">({s.code})</span>}
+                    </label>
+                  ))
+                )}
+              </div>
+            </div>
 
-      <div className="modal-actions">
-        <button onClick={handleSaveNewTeacher}>Lưu</button>
-        <button onClick={() => setAddModal(false)}>Đóng</button>
-      </div>
+            <div className="modal-actions">
+              <button onClick={handleSaveNewTeacher}>Lưu</button>
+              <button onClick={() => setAddModal(false)}>Đóng</button>
+            </div>
 
-    </div>
-  </div>
-)}
-
+          </div>
+        </ModalOverlay>
+      )}
 
       {/* Modal phân công môn */}
       {editModal && (
-        <div className="modal">
-          <div className="modal-content">
+        <ModalOverlay onClose={() => setEditModal(false)}>
+          <div>
             <h3>Phân công môn dạy</h3>
             <p>
               <strong>Giảng viên:</strong> {selectedTeacher?.name}
             </p>
 
-<div className="subjects-selection">
-  <p style={{ margin: "0 0 10px 0", fontWeight: "500", color: "#555" }}>
-    Chọn môn dạy cho <strong style={{ color: "#1a73e8" }}>{selectedTeacher?.name}</strong>
-  </p>
-  <div className="subjects-list">
-    {subjects.map((s) => (
-      <label key={s._id} className="subject-checkbox-item">
-        <input
-          type="checkbox"
-          checked={selectedSubjectIds.includes(s._id)}
-          onChange={() => {
-            setSelectedSubjectIds((prev) =>
-              prev.includes(s._id)
-                ? prev.filter((id) => id !== s._id)
-                : [...prev, s._id]
-            );
-          }}
-        />
-        <span className="subject-name">{s.name}</span>
-        {s.code && <span className="subject-code">({s.code})</span>}
-      </label>
-    ))}
-  </div>
-</div>
+            <div className="subjects-selection">
+              <p style={{ margin: "0 0 10px 0", fontWeight: "500", color: "#555" }}>
+                Chọn môn dạy cho <strong style={{ color: "#1a73e8" }}>{selectedTeacher?.name}</strong>
+              </p>
+              <div className="subjects-list">
+                {subjects.map((s) => (
+                  <label key={s._id} className="subject-checkbox-item">
+                    <input
+                      type="checkbox"
+                      checked={selectedSubjectIds.includes(s._id)}
+                      onChange={() => {
+                        setSelectedSubjectIds((prev) =>
+                          prev.includes(s._id)
+                            ? prev.filter((id) => id !== s._id)
+                            : [...prev, s._id]
+                        );
+                      }}
+                    />
+                    <span className="subject-name">{s.name}</span>
+                    {s.code && <span className="subject-code">({s.code})</span>}
+                  </label>
+                ))}
+              </div>
+            </div>
 
             <div className="modal-actions">
               <button onClick={handleSaveEdit}>Lưu</button>
               <button onClick={() => setEditModal(false)}>Đóng</button>
             </div>
           </div>
-        </div>
+        </ModalOverlay>
       )}
 
       {selectedTeacher && (
-  <TeacherDetailModal
-    teacher={selectedTeacher}
-    onClose={() => setSelectedTeacher(null)}
-    onUpdate={fetchAssignments}
-  />
-)}
+        <TeacherDetailModal
+          teacher={selectedTeacher}
+          onClose={() => setSelectedTeacher(null)}
+          onUpdate={fetchAssignments}
+        />
+      )}
 
-{notifyModal.open && (
-  <div className="modal">
-    <div className={`modal-content notify-modal ${notifyModal.type}`}>
-      <h3>
-        {notifyModal.type === "success" ? "Thành công" : "Lỗi"}
-      </h3>
-      <p>{notifyModal.message}</p>
-      <div className="modal-actions">
-        <button onClick={() => setNotifyModal({ ...notifyModal, open: false })}>
-          Đóng
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
+      {/* Bạn có thể xóa phần này nếu đã dùng ModalOverlay ở trên, nhưng mình vẫn giữ nguyên cấu trúc cho bạn */}
+      {notifyModal.open && (
+        <div className="modal">
+          <div className={`modal-content notify-modal ${notifyModal.type}`}>
+            <h3>
+              {notifyModal.type === "success" ? "Thành công" : "Lỗi"}
+            </h3>
+            <p>{notifyModal.message}</p>
+            <div className="modal-actions">
+              <button onClick={() => setNotifyModal({ ...notifyModal, open: false })}>
+                Đóng
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

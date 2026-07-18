@@ -187,9 +187,17 @@
   gap: 10px;
 }
 
-/* ====================== NÚT THÊM LỚP ====================== */
-.add-class-section {
+/* ====================== HEADER ROW ====================== */
+.admin-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
   margin-bottom: 25px;
+}
+
+.admin-header-row h2 {
+  margin: 0;
 }
 
 .add-btn {

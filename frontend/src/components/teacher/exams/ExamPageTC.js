@@ -155,6 +155,24 @@ function ExamPageTC() {
   }, []);
 
   useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        if (isModalOpen) {
+          setIsModalOpen(false);
+          resetForm();
+        }
+        if (isAIModalOpen) {
+          setIsAIModalOpen(false);
+          resetAIForm();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isModalOpen, isAIModalOpen]);
+
+  useEffect(() => {
     const loadAssignedSubjectsAndClasses = async () => {
       if (!currentUser?._id) return;
 
@@ -748,10 +766,10 @@ const loadExams = async () => {
 
       {/* Modal tạo/sửa đề thi */}
       {isModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal-content">
+        <div className="modal-overlay" onClick={() => { setIsModalOpen(false); resetForm(); }}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>{isEditMode ? "✏️ Sửa đề thi" : "➕ Tạo đề kiểm tra"}</h3>
+              <h3>{isEditMode ? "Sửa đề thi" : "Tạo đề kiểm tra"}</h3>
               <button
                 className="modal-close-btn"
                 onClick={() => {
@@ -1033,8 +1051,8 @@ const loadExams = async () => {
 
       {/* ==================== 🤖 MODAL TẠO ĐỀ AI ==================== */}
       {isAIModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal-content">
+        <div className="modal-overlay" onClick={() => { setIsAIModalOpen(false); resetAIForm(); }}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>🤖 Tạo đề thi AI</h3>
               <button

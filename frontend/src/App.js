@@ -24,10 +24,10 @@ import StudentExamsPage from "./components/student/practices/StudentExamsPage.js
 import PracticePage from "./components/student/practices/PracticePage.js";
 import PractiecSummary from "./components/student/practices/PractiecSummary.js";
 import PracticeReview from "./components/student/practices/PracticeReview.js";
-import ReportPage from "./components/teacher/ReportPage.js"; // ✅ NEW - Báo cáo thống kê
-import ExamAnalysisPage from "./components/teacher/ExamAnalysisPage.js"; // ✅ NEW - Phân tích đề thi
-
-import Profile from "./components/ProfileTeacher.js"; // ✅ KEPT - Profile
+import ReportPage from "./components/teacher/ReportPage.js";
+import ExamAnalysisPage from "./components/teacher/ExamAnalysisPage.js";
+import ClassDetailPage from "./components/teacher/ClassDetailPage.js";
+import Profile from "./components/ProfileTeacher.js";
 
 // Chat imports
 import FloatingChatButton from "./components/chat/FloatingChatButton";
@@ -36,6 +36,7 @@ import { initializeSocket, disconnectSocket } from "./socket";
 function App() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [selectedCategoryInfo, setSelectedCategoryInfo] = useState(null);
   const [selectedSubjectId, setSelectedSubjectId] = useState(null);
 
@@ -55,6 +56,8 @@ function App() {
         localStorage.removeItem("app_user");
       }
     }
+    
+    setIsCheckingAuth(false);
 
     // Cleanup: disconnect socket when component unmounts
     return () => {
@@ -85,6 +88,10 @@ function App() {
     navigate("/login");
   };
 
+  if (isCheckingAuth) {
+    return null; // Trả về null để giao diện chờ 1 nhịp, không bị flash route
+  }
+
   if (!user) {
     return (
       <Routes>
@@ -101,7 +108,7 @@ function App() {
         <Sidebar user={user} onLogout={handleLogout} />
         <div
           className="main-content"
-          style={{ flex: 1, padding: "20px", marginLeft: "240px" }}
+          style={{ flex: 1, padding: "20px", marginLeft: "260px" }}
         >
           <Routes>
             <Route path="/admin/classes" element={<AdminManagerClass />} />
@@ -121,10 +128,20 @@ function App() {
       <Sidebar user={user} onLogout={handleLogout} />
       <div
         className="main-content"
-        style={{ flex: 1, padding: "20px", marginLeft: "240px" }}
+        style={{ flex: 1, padding: "20px", marginLeft: "260px" }}
       >
         <Routes>
           {/* TEACHER  */}
+          <Route
+            path="/class-detail/:classId"
+            element={
+              user.role === "teacher" ? (
+                <ClassDetailPage />
+              ) : (
+                <Navigate to="/student" />
+              )
+            }
+          />
           <Route
             path="/dashboard"
             element={

@@ -38,7 +38,6 @@ function ReportPage() {
     setSelectedExam(null); // Reset exam selection when class changes
     try {
       const response = await axios.get(`${API_BASE}/test-exams/class/${classId}/students-scores`);
-      console.log("📊 Class data loaded:", response.data);
       setClassData(response.data);
       // Extract unique exams from classData
       if (response.data && response.data.exams && response.data.exams.length > 0) {
@@ -102,7 +101,7 @@ function ReportPage() {
       .filter(item => item !== null); // Loại bỏ sinh viên không có attempts cho bài thi này
   };
 
-  // Thông tin về bài thi được chọn
+  // Thông thông tin về bài thi được chọn
   const getExamInfo = () => {
     if (!classData || !selectedExam) return null;
 
@@ -200,21 +199,8 @@ function ReportPage() {
   };
 
   const stats = calculateStats();
-  const studentScoreData = getStudentScoreData();
   const examInfo = getExamInfo();
-  const passFailData = getPassFailData();
   const scoreDistribution = getScoreDistribution();
-
-  // Debug logging
-  console.log("📈 Stats:", stats);
-  console.log("📊 Student Score Data:", studentScoreData);
-  console.log("📉 Exam Info:", examInfo);
-  console.log("🔄 Pass/Fail Data:", passFailData);
-  console.log("📊 Score Distribution:", scoreDistribution);
-  console.log("viewMode:", viewMode);
-  console.log("classData exists:", !!classData);
-  console.log("selectedExam:", selectedExam);
-  console.log("stats.totalAttempts:", stats?.totalAttempts);
 
   // Hàm export kết quả ra Excel
   const exportToExcel = async () => {
@@ -348,17 +334,6 @@ function ReportPage() {
       Swal.fire("Lỗi!", "Không thể export dữ liệu. " + err.message, "error");
     }
   };
-
-  // Check if ResponsiveContainer is available
-  useEffect(() => {
-    setTimeout(() => {
-      const rechartsSurfaces = document.querySelectorAll('.recharts-surface');
-      console.log(`🎨 Found ${rechartsSurfaces.length} Recharts SVG surfaces`);
-      rechartsSurfaces.forEach((surface, idx) => {
-        console.log(`  Surface ${idx}:`, surface.getAttribute('width'), 'x', surface.getAttribute('height'));
-      });
-    }, 500);
-  }, [viewMode]);
 
   return (
     <div className="report-container">

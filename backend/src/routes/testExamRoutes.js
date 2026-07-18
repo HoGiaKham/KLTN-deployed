@@ -7,7 +7,13 @@ const Category = require('../models/Category');
 const mongoose = require('mongoose');
 const multer = require('multer');
 const path = require('path');
+const moment = require('moment-timezone');
 const claudeAIService = require('../services/claudeAIService');
+
+const parseVietnamDatetimeLocalToUTC = (dateTimeString) => {
+  if (!dateTimeString) return null;
+  return moment.tz(dateTimeString, 'YYYY-MM-DDTHH:mm', 'Asia/Ho_Chi_Minh').utc().toDate();
+};
 
 // Cấu hình multer để upload ảnh
 const storage = multer.diskStorage({
@@ -31,13 +37,6 @@ const calculateCloseTime = (openTime, duration, bufferTime = 5) => {
 // Helper: Parse datetime-local string (Vietnam time) and convert to UTC
 // Input: "2025-01-15T10:30" (Vietnam) -> Output: UTC Date (2025-01-15T03:30Z)
 // Subtract 7 hours to convert from Vietnam local time to UTC
-const parseLocalTimeAsUTC = (dateTimeString) => {
-  if (!dateTimeString) return null;
-  const date = new Date(dateTimeString);
-  date.setHours(date.getHours() - 7); // Subtract 7 hours to convert Vietnam time to UTC
-  return date;
-};
-
 // ✅ HELPER: Kiểm tra đề có được phép chỉnh sửa không (draft + chưa tới openTime)
 const canEditExam = (exam) => {
   // ✅ Nếu đã publish → không thể sửa
@@ -734,7 +733,7 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     // Convert datetime-local to UTC for storage
-    const openTime = parseLocalTimeAsUTC(req.body.openTime);
+    const openTime = parseVietnamDatetimeLocalToUTC(req.body.openTime);
 
     let closeTime = null;
     if (openTime && req.body.duration) {
@@ -918,7 +917,7 @@ router.post('/generate-ai-exam', async (req, res) => {
     }
 
     // 7. Tạo đề thi mới với câu hỏi AI
-    const openTime = parseLocalTimeAsUTC(openTimeString);
+    const openTime = parseVietnamDatetimeLocalToUTC(openTimeString);
     let closeTime = null;
     if (openTime && duration) {
       closeTime = calculateCloseTime(openTime, duration, bufferTime || 5);
@@ -1027,7 +1026,7 @@ router.put('/:id', async (req, res) => {
     }
 
     let closeTime = exam.closeTime;
-    const newOpenTime = parseLocalTimeAsUTC(req.body.openTime) || exam.openTime;
+    const newOpenTime = parseVietnamDatetimeLocalToUTC(req.body.openTime) || exam.openTime;
     const newDuration = req.body.duration || exam.duration;
     const newBufferTime = req.body.bufferTime !== undefined ? req.body.bufferTime : exam.bufferTime || 5;
 

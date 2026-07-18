@@ -61,25 +61,12 @@
 }
 
 .review-toolbar {
-  position: relative;
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: flex-end;
-  margin: 24px 0 30px 0;
-  height: 60px; 
+  gap: 20px;
+  margin: 25px 0;
 }
-
-.review-toolbar .history-selector {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  margin: 0;
-}
-
-.review-toolbar.single .history-selector {
-  display: none;
-}
-
 
 .review-toolbar.single {
   justify-content: flex-end;
@@ -87,15 +74,8 @@
 
 .history-selector {
   display: flex;
-  justify-content: center;
   align-items: center;
-  gap: 12px;
-  background: #f8faff;
-  border: 1px solid #dce2ff;
-  border-radius: 10px;
-  padding: 10px 18px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-  transition: all 0.2s ease;
+  gap: 10px;
 }
 
 .history-selector label {
@@ -150,26 +130,22 @@
 }
 
 .score-box {
+  flex: 1;
   background: #f4f6ff;
-  padding: 15px;
-  text-align: center;
+  padding: 15px 20px;
   border-radius: 10px;
-  margin-bottom: 25px;
-  font-size: 16px;
+  margin-bottom: 0;
 }
 
 .score-row {
   display: flex;
-  justify-content: space-between;
+  gap: 30px;
   align-items: center;
-  max-width: 500px;
-  margin: 0 auto;
+  flex-wrap: wrap;
 }
 
 .score-row p {
   margin: 0;
-  font-size: 16px;
-  color: #333;
 }
 
 .questions-list {
@@ -277,4 +253,66 @@
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   object-fit: contain;
+}
+/* =========================================
+   UI TABS STYLES (Chi tiết bài làm | Thống kê)
+   ========================================= */
+.custom-tabs-container {
+  display: flex;
+  border-bottom: 2px solid #e2e8f0;
+  margin-bottom: 24px;
+  margin-top: 15px;
+  gap: 10px;
+}
+
+.custom-tab-btn {
+  background: transparent;
+  border: none;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.custom-tab-btn:hover {
+  color: #2e3cd4;
+  background-color: rgba(46, 60, 212, 0.05);
+  border-radius: 6px 6px 0 0;
+}
+
+.custom-tab-btn.active {
+  color: #2e3cd4;
+}
+
+/* Đường gạch ngang mượt mà khi tab được active */
+.custom-tab-btn.active::after {
+  content: "";
+  position: absolute;
+  bottom: -2px; /* Đè lên border-bottom của container */
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: #2e3cd4;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  animation: tabSlide 0.3s ease;
+}
+
+@keyframes tabSlide {
+  from { width: 0; left: 50%; }
+  to { width: 100%; left: 0; }
+}
+
+.personal-stats {
+  padding: 20px 26px;
+  background: #f8faff;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+  /* ĐÃ XÓA position: relative và top: -100px */
 }

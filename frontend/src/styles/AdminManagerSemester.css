@@ -19,6 +19,18 @@
   font-weight: 600;
 }
 
+.admin-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 25px;
+}
+
+.admin-header-row h2 {
+  margin: 0;
+}
+
 .add-btn {
   background: linear-gradient(135deg, #1a73e8, #0d47a1);
   color: white;

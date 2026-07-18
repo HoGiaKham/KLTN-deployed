@@ -6,10 +6,18 @@
   min-height: 100vh;
 }
 
-/* Tiêu đề */
-.admin-teacher-container h2 {
-  color: #1a73e8;
+/* HEADER ROW */
+.admin-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
   margin-bottom: 25px;
+}
+
+.admin-header-row h2 {
+  color: #1a73e8;
+  margin: 0;
   font-size: 28px;
   font-weight: 600;
 }

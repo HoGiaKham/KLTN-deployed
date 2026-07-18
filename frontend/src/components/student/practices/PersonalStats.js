@@ -1,5 +1,5 @@
 // src/components/PersonalStats.js
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -14,9 +14,22 @@ import "../../../styles/PersonalStats.css";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-const PersonalStats = ({ examId, questions, history, onViewDetails }) => {
+  const PersonalStats = ({ examId, questions, history }) => {
   const [selectedQuestion, setSelectedQuestion] = useState(null);
   const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+      if (!showModal) return;
+
+      const handleKeyDown = (e) => {
+        if (e.key === "Escape") {
+          setShowModal(false);
+        }
+      };
+
+      document.addEventListener("keydown", handleKeyDown);
+      return () => document.removeEventListener("keydown", handleKeyDown);
+    }, [showModal]);
 
   const stats = useMemo(() => {
     if (!history || history.length === 0 || questions.length === 0) return null;
@@ -119,7 +132,6 @@ const PersonalStats = ({ examId, questions, history, onViewDetails }) => {
           afterLabel: (context) => {
             const qId = Object.keys(stats.questionStats)[context.dataIndex];
             const q = stats.questionStats[qId].question;
-            // Xóa HTML tags để chỉ hiển thị text
             const plainText = q.title ? q.title.replace(/<[^>]*>/g, '') : '';
             return `Câu: ${plainText}`;
           },
@@ -136,47 +148,34 @@ const PersonalStats = ({ examId, questions, history, onViewDetails }) => {
   return (
     <div className="personal-stats">
       <div className="stats-summary">
-        <div className="stats-header">
-          <h3>Thống kê cá nhân của bạn</h3>
-
-        </div>
         <div className="stats-info">
           <p>
             <strong>Tổng số lần làm:</strong> {stats.totalAttempts}
           </p>
+
           <p className="highlight-wrong">
             Câu bạn <strong>sai nhiều nhất</strong>: {stats.mostWrongTitle} (
             {stats.mostWrong.wrong} lần sai)
           </p>
         </div>
-                  {onViewDetails && (
-            <button className="toggle-stats-btn back-btn" onClick={onViewDetails}>
-              Xem chi tiết bài làm
-            </button>
-          )}
       </div>
 
-<div className="stats-chart" style={{ height: "400px", overflowX: "auto" }}>
-    <Bar data={chartData} options={options} />
-</div>
+      <div className="stats-chart" style={{ height: "400px", overflowX: "auto" }}>
+        <Bar data={chartData} options={options} />
+      </div>
 
-
-      {/* MODAL CHI TIẾT CÂU HỎI */}
       {showModal && selectedQuestion && (
         <div className="stats-modal-overlay" onClick={() => setShowModal(false)}>
           <div className="stats-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>{selectedQuestion.stats.title}</h3>
-              <button className="close-btn" onClick={() => setShowModal(false)}>
-                ×
-              </button>
             </div>
 
             <div className="modal-body">
               <p>
-                <strong>Câu hỏi:</strong>
+                <strong>Câu hỏi: </strong>
                 {selectedQuestion.title && selectedQuestion.title.includes('<') ? (
-                  <div dangerouslySetInnerHTML={{ __html: selectedQuestion.title }} style={{ display: 'inline' }} />
+                  <span dangerouslySetInnerHTML={{ __html: selectedQuestion.title }} style={{ display: 'inline' }} />
                 ) : (
                   selectedQuestion.title
                 )}

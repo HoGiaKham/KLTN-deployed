@@ -50,15 +50,9 @@
   border-radius: 12px;
   padding: 16px;
   background: white;
-  cursor: pointer;
+  cursor: default;
   transition: all 0.2s;
   box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-}
-
-.class-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
-  border-color: #1976d2;
 }
 
 .class-card h3 {
@@ -81,7 +75,7 @@
   border: none;
   border-radius: 6px;
   font-size: 0.9em;
-  cursor: pointer;
+  cursor: default;
 }
 
 .back-btn {

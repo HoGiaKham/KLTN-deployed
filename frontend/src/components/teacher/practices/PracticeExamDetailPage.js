@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "../../../styles/PracticeExamDetailPage.css";
 import RichTextEditor from "../../RichTextEditor";
@@ -226,7 +226,7 @@ const proceedRandomAdd = async (count) => {
   const selected = shuffled.slice(0, count);
 
   try {
-    const res = await fetch(`${BASE_URL}/practice-exams/${examId}/questions/bulk`, {
+    const res = await fetch(`${API_BASE}/practice-exams/${examId}/questions/bulk`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ questionIds: selected.map(q => q._id) }),
@@ -269,9 +269,9 @@ const proceedRandomAdd = async (count) => {
     await proceedRandomAdd(randomCount);
   };
 
-  const fetchQuestions = async () => {
+  const fetchQuestions = useCallback(async () => {
     try {
-      const res = await fetch(`${BASE_URL}/practice-exams/${examId}/questions`);
+      const res = await fetch(`${API_BASE}/practice-exams/${examId}/questions`);
       if (!res.ok) throw new Error("Không thể load questions");
       const data = await res.json();
       setQuestions(data || []);
@@ -279,7 +279,7 @@ const proceedRandomAdd = async (count) => {
       console.error("Lỗi khi load questions:", err);
       setQuestions([]);
     }
-  };
+  }, [examId]);
 
   useEffect(() => {
     if (!examId) {
@@ -292,7 +292,7 @@ const fetchExam = async () => {
   try {
     const user = JSON.parse(localStorage.getItem("app_user") || "{}");
     const res = await fetch(
-      `${BASE_URL}/practice-exams/${examId}?userId=${user._id}&role=${user.role}`
+      `${API_BASE}/practice-exams/${examId}?userId=${user._id}&role=${user.role}`
     );
     if (!res.ok) throw new Error("Không thể load exam");
     const data = await res.json();
@@ -324,7 +324,7 @@ const fetchExam = async () => {
     if (!examData || !examData.categories || examData.categories.length === 0) return;
 
     try {
-      const res = await fetch(`${BASE_URL}/practice-exams/${examId}/all-questions`);
+      const res = await fetch(`${API_BASE}/practice-exams/${examId}/all-questions`);
       if (!res.ok) throw new Error("Không thể load ngân hàng câu hỏi");
       const data = await res.json();
       const currentQuestionIds = questions.map(q => q._id);
@@ -418,7 +418,7 @@ const fetchExam = async () => {
     }
 
     try {
-      const res = await fetch(`${BASE_URL}/practice-exams/${examId}/questions/bulk`, {
+      const res = await fetch(`${API_BASE}/practice-exams/${examId}/questions/bulk`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ questionIds: selectedBankQuestions }),
@@ -489,7 +489,7 @@ const handleAddQuestion = async () => {
   }
 
   try {
-    const res = await fetch(`${BASE_URL}/practice-exams/${examId}/questions`, {
+    const res = await fetch(`${API_BASE}/practice-exams/${examId}/questions`, {
       method: "POST",
       body: formData,
     });
@@ -529,7 +529,7 @@ const handleDeleteQuestion = (questionId) => {
 const confirmDeleteQuestion = async () => {
   const questionId = deleteConfirm.questionId;
   try {
-    const res = await fetch(`${BASE_URL}/practice-exams/${examId}/questions/${questionId}`, {
+    const res = await fetch(`${API_BASE}/practice-exams/${examId}/questions/${questionId}`, {
       method: "DELETE",
     });
 

@@ -174,27 +174,23 @@
 .student-modal {
   background: white;
   width: 90%;
-  max-width: 700px;
-  border-radius: 16px;
+  max-width: 800px;
+  border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  max-height: 80vh;
-  overflow: hidden;
-  animation: slideUp 0.3s ease;
+  height: 85vh;
   display: flex;
   flex-direction: column;
-}
-
-@keyframes slideUp {
-  from { transform: translateY(40px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  overflow: hidden;
+  animation: slideUp 0.3s ease;
 }
 
 /* --- Header --- */
 .modal-header {
   padding: 1rem 1.5rem;
-  background: linear-gradient(135deg, #1976d2, #42a5f5);
+  background: #1976d2; /* Đổi thành màu trơn cho gọn gàng hoặc giữ gradient tùy bạn */
   color: white;
   display: flex;
+  flex-direction: row; /* Ép nằm ngang */
   justify-content: space-between;
   align-items: center;
 }
@@ -211,6 +207,8 @@
   font-size: 1.8rem;
   color: white;
   cursor: pointer;
+  line-height: 1; /* Tránh padding ẩn làm nút x bị lệch */
+  padding: 0;
   transition: transform 0.2s ease;
 }
 
@@ -221,33 +219,38 @@
 /* --- Body --- */
 .modal-body {
   padding: 1.5rem 2rem;
-  max-height: 60vh;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  flex: 1; /* Chiếm toàn bộ không gian còn lại của Modal */
+  min-height: 0;
   background: #f9f9f9;
 }
 
-/* Class info box */
+/* Class info box - CHIA 2 CỘT */
 .class-info {
   background: #eef4ff;
   border: 1px solid #d6e2ff;
-  border-radius: 10px;
+  border-radius: 8px;
   padding: 1rem 1.2rem;
-  margin-bottom: 1.2rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Chia thông tin thành 2 cột để tiết kiệm chiều dọc */
+  gap: 12px;
 }
 
 .class-info p {
-  margin: 4px 0;
+  margin: 0;
   color: #333;
-  font-size: 15px;
+  font-size: 14px;
 }
 
 /* --- Search bar --- */
 .search-sort-bar {
-  margin-bottom: 1rem;
+  margin-bottom: 0;
 }
 
 .search-sort-bar input {
-  width: 100%; /* ✅ Full modal width */
+  width: 100%;
   padding: 10px 12px;
   border: 1px solid #ccc;
   border-radius: 8px;
@@ -262,23 +265,36 @@
   box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.15);
 }
 
-/* --- Table --- */
+/* --- Table & Scrollbar --- */
 .student-table-wrapper {
-  overflow-x: auto;
+  flex: 1;
+  overflow-y: auto;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #eee;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+/* Custom lại scrollbar cho đẹp (tùy chọn) */
+.student-table-wrapper::-webkit-scrollbar {
+  width: 6px;
+}
+.student-table-wrapper::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+.student-table-wrapper::-webkit-scrollbar-track {
+  background: #f1f1f1;
 }
 
 .student-table {
   width: 100%;
   border-collapse: collapse;
-  background: white;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
 }
 
 .student-table th,
 .student-table td {
-  padding: 10px 12px;
+  padding: 12px 14px;
   text-align: left;
   border-bottom: 1px solid #eee;
 }
@@ -288,7 +304,10 @@
   color: white;
   font-weight: 600;
   font-size: 14px;
-  position: relative;
+  position: sticky;
+  top: 0;
+  z-index: 10; 
+  white-space: nowrap;
 }
 
 .student-table th.sortable {
@@ -301,7 +320,7 @@
 }
 
 .student-table tr:hover td {
-  background: #f0f4ff; /* ✅ Không trắng bóc */
+  background: #f0f4ff;
   color: #111;
 }
 
@@ -315,7 +334,7 @@
 .modal-footer {
   padding: 1rem 1.5rem;
   text-align: right;
-  background: #f5f6fa;
+  background: white;
   border-top: 1px solid #eee;
 }
 

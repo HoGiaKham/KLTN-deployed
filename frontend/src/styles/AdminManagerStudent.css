@@ -5,6 +5,25 @@
   min-height: 100vh;
 }
 
+.student-search-filter {
+  margin-bottom: 20px;
+}
+
+.student-search-filter input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 15px;
+  outline: none;
+  transition: border 0.3s;
+}
+
+.student-search-filter input:focus {
+  border-color: #1a73e8;
+  box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+}
+
 /* Header */
 .admin-student-header {
   display: flex;

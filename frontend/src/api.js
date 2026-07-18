@@ -140,3 +140,8 @@ export const createPracticeExam = async (examData) => {
   const response = await axios.post(`${API_BASE}/practice-exams`, examData);
   return response.data;
 };
+
+export const fetchClassById = async (classId) => {
+  const response = await axios.get(`${API_BASE}/classes/${classId}`);
+  return response.data;
+};
